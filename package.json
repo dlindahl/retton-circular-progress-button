@@ -1,0 +1,26 @@
+{
+  "name": "retton-circular-progress-button",
+  "version": "1.0.0",
+  "description": "An animated progress button with state",
+  "keywords": [
+    "button",
+    "react",
+    "codrops"
+  ],
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Derek Lindahl <actual@gatorsix.com>",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/dlindahl/retton-circular-progress-button/issues"
+  },
+  "homepage": "https://github.com/dlindahl/retton-circular-progress-button",
+  "dependencies": {
+  },
+  "peerDependencies": {
+  },
+  "devDependencies": {
+  }
+}
