@@ -10,6 +10,7 @@
   "main": "index.js",
   "scripts": {
     "build": "node_modules/.bin/browserify index.js -o dist/retton-circular-progress-button.js --verbose",
+    "watch": "node_modules/.bin/watchify index.js -o dist/retton-circular-progress-button.js --verbose",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "Derek Lindahl <actual@gatorsix.com>",
@@ -25,7 +26,8 @@
   },
   "devDependencies": {
     "browserify": "^8.0.3",
-    "reactify": "^0.17.1"
+    "reactify": "^0.17.1",
+    "watchify": "^2.2.1"
   },
   "browserify": {
     "transform": [
