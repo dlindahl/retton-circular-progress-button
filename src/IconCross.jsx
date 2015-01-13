@@ -15,11 +15,11 @@ var IconCross = React.createClass({
   },
   render: function() {
     return (
-      <svg className="cross" width={this.props.width} height={this.props.height}>
-        <path d="m35,35l-9.3,-9.3"/>
-        <path d="m35,35l9.3,9.3"/>
-        <path d="m35,35l-9.3,9.3"/>
-        <path d="m35,35l9.3,-9.3"/>
+      <svg className="Retton-Icon-Cross" width={this.props.width} height={this.props.height}>
+        <path className="Retton-Icon-Cross-path" d="m35,35l-9.3,-9.3"/>
+        <path className="Retton-Icon-Cross-path" d="m35,35l9.3,9.3"/>
+        <path className="Retton-Icon-Cross-path" d="m35,35l-9.3,9.3"/>
+        <path className="Retton-Icon-Cross-path" d="m35,35l9.3,-9.3"/>
       </svg>
     );
   }

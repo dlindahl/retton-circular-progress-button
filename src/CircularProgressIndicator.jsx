@@ -71,8 +71,13 @@ var CircularProgressIndicator = React.createClass({
       strokeDashoffset: this.state.strokeDashoffset
     };
     return (
-      <svg className="progress-circle" width={this.props.width} height={this.props.height}>
-        <path ref="path" d="m35,2.5c17.955803,0 32.5,14.544199 32.5,32.5c0,17.955803 -14.544197,32.5 -32.5,32.5c-17.955803,0 -32.5,-14.544197 -32.5,-32.5c0,-17.955801 14.544197,-32.5 32.5,-32.5z" style={progressStyle}/>
+      <svg className="Retton-CircularProgressIndicator" width={this.props.width} height={this.props.height}>
+        <path
+          className="Retton-CircularProgressIndicator-path"
+          d="m35,2.5c17.955803,0 32.5,14.544199 32.5,32.5c0,17.955803 -14.544197,32.5 -32.5,32.5c-17.955803,0 -32.5,-14.544197 -32.5,-32.5c0,-17.955801 14.544197,-32.5 32.5,-32.5z"
+          ref="path"
+          style={progressStyle}
+        />
       </svg>
     );
   }

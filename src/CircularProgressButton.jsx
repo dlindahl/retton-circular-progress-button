@@ -27,6 +27,7 @@ var CircularProgressButton = React.createClass({
   },
   propTypes: {
     disabled: React.PropTypes.bool,
+    elastic: React.PropTypes.bool,
     height: React.PropTypes.number,
     loading: React.PropTypes.bool.isRequired,
     onClick: React.PropTypes.func.isRequired,
@@ -36,10 +37,11 @@ var CircularProgressButton = React.createClass({
   },
   getDefaultProps: function() {
     return {
+      elastic: true,
       height: 70,
       onClick: emptyFn,
       result: RESULT_STATES.INDETERMINATE,
-      width: 70
+      width: 250
     };
   },
   getInitialState: function() {
@@ -108,25 +110,30 @@ var CircularProgressButton = React.createClass({
   render: function() {
     var disabled = this.props.disabled || this.state.loading;
     var cls = cx({
-      'progress-button': true,
-      'loading': this.state.loading,
-      'success': this.state.result === RESULT_STATES.SUCCESS,
-      'error': this.state.result === RESULT_STATES.ERROR
+      'Retton-CircularProgressButton': true,
+      'is-elastic': this.props.elastic,
+      'is-loading': this.state.loading,
+      'is-success': this.state.result === RESULT_STATES.SUCCESS,
+      'is-error': this.state.result === RESULT_STATES.ERROR
     });
+    var btnStyle = {
+      height: this.props.height,
+      width: this.state.loading ? this.props.height : this.props.width
+    };
     return (
       <div className={cls} onClick={this.handleClick}>
-        <button ref="button" disabled={disabled}>
-          <span>{this.props.children}</span>
+        <button ref="button" disabled={disabled} className="Retton-CircularProgressButton-button" style={btnStyle}>
+          <span className="Retton-CircularProgressButton-label">{this.props.children}</span>
         </button>
         <CircularProgressIndicator
           height={this.props.height}
           loading={this.state.loading}
           onProgressChanged={this.onProgressChanged}
           progress={this.state.progress}
-          width={this.props.width}
+          width={this.props.height}
         />
-        <IconCheck width={this.props.width} height={this.props.height}/>
-        <IconCross width={this.props.width} height={this.props.height}/>
+        <IconCheck width={this.props.height} height={this.props.height}/>
+        <IconCross width={this.props.height} height={this.props.height}/>
       </div>
     );
   }

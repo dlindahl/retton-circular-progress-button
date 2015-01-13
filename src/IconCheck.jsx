@@ -15,9 +15,9 @@ var IconCheck = React.createClass({
   },
   render: function() {
     return (
-      <svg className="checkmark" width={this.props.width} height={this.props.height}>
-        <path d="m31.5,46.5l15.3,-23.2"/>
-        <path d="m31.5,46.5l-8.5,-7.1"/>
+      <svg className="Retton-Icon-Checkmark" width={this.props.width} height={this.props.height}>
+        <path className="Retton-Icon-Checkmark-path" d="m31.5,46.5l15.3,-23.2"/>
+        <path className="Retton-Icon-Checkmark-path" d="m31.5,46.5l-8.5,-7.1"/>
       </svg>
     );
   }
