@@ -9,8 +9,12 @@
   ],
   "main": "index.js",
   "scripts": {
-    "build": "node_modules/.bin/browserify index.js -o dist/retton-circular-progress-button.js --verbose",
-    "watch": "node_modules/.bin/watchify index.js -o dist/retton-circular-progress-button.js --verbose",
+    "build": "npm run build-module & npm run build-demo",
+    "watch": "npm run watch-module & npm run watch-demo",
+    "build-module": "node_modules/.bin/browserify index.js -o dist/retton-circular-progress-button.js --verbose",
+    "watch-module": "node_modules/.bin/watchify index.js -o dist/retton-circular-progress-button.js --verbose",
+    "build-demo": "node_modules/.bin/browserify demo/demo.jsx -o demo/demo.build.js --verbose",
+    "watch-demo": "node_modules/.bin/watchify demo/demo.jsx -o demo/demo.build.js --verbose",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "Derek Lindahl <actual@gatorsix.com>",
