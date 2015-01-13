@@ -37,7 +37,7 @@ var CircularProgressButton = React.createClass({
   },
   getDefaultProps: function() {
     return {
-      elastic: true,
+      elastic: false,
       height: 70,
       onClick: emptyFn,
       result: RESULT_STATES.INDETERMINATE,

@@ -7,7 +7,8 @@ var el = document.getElementById('target');
 
 var DemoButton = React.createClass({
   propTypes: {
-    demo: React.PropTypes.oneOf(Object.keys(CircularProgressButton.RESULT_STATES))
+    demo: React.PropTypes.oneOf(Object.keys(CircularProgressButton.RESULT_STATES)),
+    elastic: React.PropTypes.bool
   },
   componentWillMount: function() {
     this.store = new ProgressStore();
@@ -33,6 +34,7 @@ var DemoButton = React.createClass({
     return (
       <CircularProgressButton
         ref="button"
+        elastic={this.props.elastic}
         onClick={this.onClick}
         progress={this.state.progress}
         loading={this.state.loading}
@@ -56,8 +58,8 @@ var App = React.createClass({
 
         <h2>Elastic version, with some easings (success, error)</h2>
         <div className="box">
-          <DemoButton demo={CircularProgressButton.SUCCESS}/>
-          <DemoButton demo={CircularProgressButton.ERROR}/>
+          <DemoButton elastic demo={CircularProgressButton.SUCCESS}/>
+          <DemoButton elastic demo={CircularProgressButton.ERROR}/>
         </div>
       </section>
     );

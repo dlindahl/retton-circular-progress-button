@@ -1,4 +1,4 @@
-(function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({"/Users/dlindahl/Personal/retton/retton-circular-progress-button/demo/ProgressStore.js":[function(require,module,exports){
+(function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 'use strict';
 
 var assign = require('react/lib/Object.assign');
@@ -57,7 +57,7 @@ ProgressStore.prototype = assign({}, EventEmitter.prototype, {
 
 module.exports = ProgressStore;
 
-},{"events":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/watchify/node_modules/browserify/node_modules/events/events.js","react/lib/Object.assign":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/Object.assign.js"}],"/Users/dlindahl/Personal/retton/retton-circular-progress-button/demo/demo.jsx":[function(require,module,exports){
+},{"events":4,"react/lib/Object.assign":31}],2:[function(require,module,exports){
 'use strict';
 
 var React = require('react');
@@ -67,7 +67,8 @@ var el = document.getElementById('target');
 
 var DemoButton = React.createClass({displayName: "DemoButton",
   propTypes: {
-    demo: React.PropTypes.oneOf(Object.keys(CircularProgressButton.RESULT_STATES))
+    demo: React.PropTypes.oneOf(Object.keys(CircularProgressButton.RESULT_STATES)),
+    elastic: React.PropTypes.bool
   },
   componentWillMount: function() {
     this.store = new ProgressStore();
@@ -93,6 +94,7 @@ var DemoButton = React.createClass({displayName: "DemoButton",
     return (
       React.createElement(CircularProgressButton, {
         ref: "button", 
+        elastic: this.props.elastic, 
         onClick: this.onClick, 
         progress: this.state.progress, 
         loading: this.state.loading, 
@@ -116,8 +118,8 @@ var App = React.createClass({displayName: "App",
 
         React.createElement("h2", null, "Elastic version, with some easings (success, error)"), 
         React.createElement("div", {className: "box"}, 
-          React.createElement(DemoButton, {demo: CircularProgressButton.SUCCESS}), 
-          React.createElement(DemoButton, {demo: CircularProgressButton.ERROR})
+          React.createElement(DemoButton, {elastic: true, demo: CircularProgressButton.SUCCESS}), 
+          React.createElement(DemoButton, {elastic: true, demo: CircularProgressButton.ERROR})
         )
       )
     );
@@ -126,14 +128,405 @@ var App = React.createClass({displayName: "App",
 
 React.render(React.createElement(App, null), el);
 
-},{"../index.js":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/index.js","./ProgressStore":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/demo/ProgressStore.js","react":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/react.js"}],"/Users/dlindahl/Personal/retton/retton-circular-progress-button/index.js":[function(require,module,exports){
+},{"../index.js":3,"./ProgressStore":1,"react":152}],3:[function(require,module,exports){
 'use strict';
 
 var CircularProgressButton = require('./src/CircularProgressButton.jsx');
 
 module.exports = CircularProgressButton;
 
-},{"./src/CircularProgressButton.jsx":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/src/CircularProgressButton.jsx"}],"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/AutoFocusMixin.js":[function(require,module,exports){
+},{"./src/CircularProgressButton.jsx":153}],4:[function(require,module,exports){
+// Copyright Joyent, Inc. and other Node contributors.
+//
+// Permission is hereby granted, free of charge, to any person obtaining a
+// copy of this software and associated documentation files (the
+// "Software"), to deal in the Software without restriction, including
+// without limitation the rights to use, copy, modify, merge, publish,
+// distribute, sublicense, and/or sell copies of the Software, and to permit
+// persons to whom the Software is furnished to do so, subject to the
+// following conditions:
+//
+// The above copyright notice and this permission notice shall be included
+// in all copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
+// OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+// MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN
+// NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
+// DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
+// OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
+// USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+function EventEmitter() {
+  this._events = this._events || {};
+  this._maxListeners = this._maxListeners || undefined;
+}
+module.exports = EventEmitter;
+
+// Backwards-compat with node 0.10.x
+EventEmitter.EventEmitter = EventEmitter;
+
+EventEmitter.prototype._events = undefined;
+EventEmitter.prototype._maxListeners = undefined;
+
+// By default EventEmitters will print a warning if more than 10 listeners are
+// added to it. This is a useful default which helps finding memory leaks.
+EventEmitter.defaultMaxListeners = 10;
+
+// Obviously not all Emitters should be limited to 10. This function allows
+// that to be increased. Set to zero for unlimited.
+EventEmitter.prototype.setMaxListeners = function(n) {
+  if (!isNumber(n) || n < 0 || isNaN(n))
+    throw TypeError('n must be a positive number');
+  this._maxListeners = n;
+  return this;
+};
+
+EventEmitter.prototype.emit = function(type) {
+  var er, handler, len, args, i, listeners;
+
+  if (!this._events)
+    this._events = {};
+
+  // If there is no 'error' event listener then throw.
+  if (type === 'error') {
+    if (!this._events.error ||
+        (isObject(this._events.error) && !this._events.error.length)) {
+      er = arguments[1];
+      if (er instanceof Error) {
+        throw er; // Unhandled 'error' event
+      }
+      throw TypeError('Uncaught, unspecified "error" event.');
+    }
+  }
+
+  handler = this._events[type];
+
+  if (isUndefined(handler))
+    return false;
+
+  if (isFunction(handler)) {
+    switch (arguments.length) {
+      // fast cases
+      case 1:
+        handler.call(this);
+        break;
+      case 2:
+        handler.call(this, arguments[1]);
+        break;
+      case 3:
+        handler.call(this, arguments[1], arguments[2]);
+        break;
+      // slower
+      default:
+        len = arguments.length;
+        args = new Array(len - 1);
+        for (i = 1; i < len; i++)
+          args[i - 1] = arguments[i];
+        handler.apply(this, args);
+    }
+  } else if (isObject(handler)) {
+    len = arguments.length;
+    args = new Array(len - 1);
+    for (i = 1; i < len; i++)
+      args[i - 1] = arguments[i];
+
+    listeners = handler.slice();
+    len = listeners.length;
+    for (i = 0; i < len; i++)
+      listeners[i].apply(this, args);
+  }
+
+  return true;
+};
+
+EventEmitter.prototype.addListener = function(type, listener) {
+  var m;
+
+  if (!isFunction(listener))
+    throw TypeError('listener must be a function');
+
+  if (!this._events)
+    this._events = {};
+
+  // To avoid recursion in the case that type === "newListener"! Before
+  // adding it to the listeners, first emit "newListener".
+  if (this._events.newListener)
+    this.emit('newListener', type,
+              isFunction(listener.listener) ?
+              listener.listener : listener);
+
+  if (!this._events[type])
+    // Optimize the case of one listener. Don't need the extra array object.
+    this._events[type] = listener;
+  else if (isObject(this._events[type]))
+    // If we've already got an array, just append.
+    this._events[type].push(listener);
+  else
+    // Adding the second element, need to change to array.
+    this._events[type] = [this._events[type], listener];
+
+  // Check for listener leak
+  if (isObject(this._events[type]) && !this._events[type].warned) {
+    var m;
+    if (!isUndefined(this._maxListeners)) {
+      m = this._maxListeners;
+    } else {
+      m = EventEmitter.defaultMaxListeners;
+    }
+
+    if (m && m > 0 && this._events[type].length > m) {
+      this._events[type].warned = true;
+      console.error('(node) warning: possible EventEmitter memory ' +
+                    'leak detected. %d listeners added. ' +
+                    'Use emitter.setMaxListeners() to increase limit.',
+                    this._events[type].length);
+      if (typeof console.trace === 'function') {
+        // not supported in IE 10
+        console.trace();
+      }
+    }
+  }
+
+  return this;
+};
+
+EventEmitter.prototype.on = EventEmitter.prototype.addListener;
+
+EventEmitter.prototype.once = function(type, listener) {
+  if (!isFunction(listener))
+    throw TypeError('listener must be a function');
+
+  var fired = false;
+
+  function g() {
+    this.removeListener(type, g);
+
+    if (!fired) {
+      fired = true;
+      listener.apply(this, arguments);
+    }
+  }
+
+  g.listener = listener;
+  this.on(type, g);
+
+  return this;
+};
+
+// emits a 'removeListener' event iff the listener was removed
+EventEmitter.prototype.removeListener = function(type, listener) {
+  var list, position, length, i;
+
+  if (!isFunction(listener))
+    throw TypeError('listener must be a function');
+
+  if (!this._events || !this._events[type])
+    return this;
+
+  list = this._events[type];
+  length = list.length;
+  position = -1;
+
+  if (list === listener ||
+      (isFunction(list.listener) && list.listener === listener)) {
+    delete this._events[type];
+    if (this._events.removeListener)
+      this.emit('removeListener', type, listener);
+
+  } else if (isObject(list)) {
+    for (i = length; i-- > 0;) {
+      if (list[i] === listener ||
+          (list[i].listener && list[i].listener === listener)) {
+        position = i;
+        break;
+      }
+    }
+
+    if (position < 0)
+      return this;
+
+    if (list.length === 1) {
+      list.length = 0;
+      delete this._events[type];
+    } else {
+      list.splice(position, 1);
+    }
+
+    if (this._events.removeListener)
+      this.emit('removeListener', type, listener);
+  }
+
+  return this;
+};
+
+EventEmitter.prototype.removeAllListeners = function(type) {
+  var key, listeners;
+
+  if (!this._events)
+    return this;
+
+  // not listening for removeListener, no need to emit
+  if (!this._events.removeListener) {
+    if (arguments.length === 0)
+      this._events = {};
+    else if (this._events[type])
+      delete this._events[type];
+    return this;
+  }
+
+  // emit removeListener for all listeners on all events
+  if (arguments.length === 0) {
+    for (key in this._events) {
+      if (key === 'removeListener') continue;
+      this.removeAllListeners(key);
+    }
+    this.removeAllListeners('removeListener');
+    this._events = {};
+    return this;
+  }
+
+  listeners = this._events[type];
+
+  if (isFunction(listeners)) {
+    this.removeListener(type, listeners);
+  } else {
+    // LIFO order
+    while (listeners.length)
+      this.removeListener(type, listeners[listeners.length - 1]);
+  }
+  delete this._events[type];
+
+  return this;
+};
+
+EventEmitter.prototype.listeners = function(type) {
+  var ret;
+  if (!this._events || !this._events[type])
+    ret = [];
+  else if (isFunction(this._events[type]))
+    ret = [this._events[type]];
+  else
+    ret = this._events[type].slice();
+  return ret;
+};
+
+EventEmitter.listenerCount = function(emitter, type) {
+  var ret;
+  if (!emitter._events || !emitter._events[type])
+    ret = 0;
+  else if (isFunction(emitter._events[type]))
+    ret = 1;
+  else
+    ret = emitter._events[type].length;
+  return ret;
+};
+
+function isFunction(arg) {
+  return typeof arg === 'function';
+}
+
+function isNumber(arg) {
+  return typeof arg === 'number';
+}
+
+function isObject(arg) {
+  return typeof arg === 'object' && arg !== null;
+}
+
+function isUndefined(arg) {
+  return arg === void 0;
+}
+
+},{}],5:[function(require,module,exports){
+// shim for using process in browser
+
+var process = module.exports = {};
+
+process.nextTick = (function () {
+    var canSetImmediate = typeof window !== 'undefined'
+    && window.setImmediate;
+    var canMutationObserver = typeof window !== 'undefined'
+    && window.MutationObserver;
+    var canPost = typeof window !== 'undefined'
+    && window.postMessage && window.addEventListener
+    ;
+
+    if (canSetImmediate) {
+        return function (f) { return window.setImmediate(f) };
+    }
+
+    var queue = [];
+
+    if (canMutationObserver) {
+        var hiddenDiv = document.createElement("div");
+        var observer = new MutationObserver(function () {
+            var queueList = queue.slice();
+            queue.length = 0;
+            queueList.forEach(function (fn) {
+                fn();
+            });
+        });
+
+        observer.observe(hiddenDiv, { attributes: true });
+
+        return function nextTick(fn) {
+            if (!queue.length) {
+                hiddenDiv.setAttribute('yes', 'no');
+            }
+            queue.push(fn);
+        };
+    }
+
+    if (canPost) {
+        window.addEventListener('message', function (ev) {
+            var source = ev.source;
+            if ((source === window || source === null) && ev.data === 'process-tick') {
+                ev.stopPropagation();
+                if (queue.length > 0) {
+                    var fn = queue.shift();
+                    fn();
+                }
+            }
+        }, true);
+
+        return function nextTick(fn) {
+            queue.push(fn);
+            window.postMessage('process-tick', '*');
+        };
+    }
+
+    return function nextTick(fn) {
+        setTimeout(fn, 0);
+    };
+})();
+
+process.title = 'browser';
+process.browser = true;
+process.env = {};
+process.argv = [];
+
+function noop() {}
+
+process.on = noop;
+process.addListener = noop;
+process.once = noop;
+process.off = noop;
+process.removeListener = noop;
+process.removeAllListeners = noop;
+process.emit = noop;
+
+process.binding = function (name) {
+    throw new Error('process.binding is not supported');
+};
+
+// TODO(shtylman)
+process.cwd = function () { return '/' };
+process.chdir = function (dir) {
+    throw new Error('process.chdir is not supported');
+};
+
+},{}],6:[function(require,module,exports){
 /**
  * Copyright 2013-2014, Facebook, Inc.
  * All rights reserved.
@@ -160,7 +553,7 @@ var AutoFocusMixin = {
 
 module.exports = AutoFocusMixin;
 
-},{"./focusNode":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/focusNode.js"}],"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/BeforeInputEventPlugin.js":[function(require,module,exports){
+},{"./focusNode":117}],7:[function(require,module,exports){
 /**
  * Copyright 2013 Facebook, Inc.
  * All rights reserved.
@@ -382,7 +775,7 @@ var BeforeInputEventPlugin = {
 
 module.exports = BeforeInputEventPlugin;
 
-},{"./EventConstants":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/EventConstants.js","./EventPropagators":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/EventPropagators.js","./ExecutionEnvironment":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/ExecutionEnvironment.js","./SyntheticInputEvent":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/SyntheticInputEvent.js","./keyOf":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/keyOf.js"}],"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/CSSProperty.js":[function(require,module,exports){
+},{"./EventConstants":20,"./EventPropagators":25,"./ExecutionEnvironment":26,"./SyntheticInputEvent":94,"./keyOf":139}],8:[function(require,module,exports){
 /**
  * Copyright 2013-2014, Facebook, Inc.
  * All rights reserved.
@@ -501,7 +894,7 @@ var CSSProperty = {
 
 module.exports = CSSProperty;
 
-},{}],"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/CSSPropertyOperations.js":[function(require,module,exports){
+},{}],9:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-2014, Facebook, Inc.
@@ -636,7 +1029,7 @@ var CSSPropertyOperations = {
 module.exports = CSSPropertyOperations;
 
 }).call(this,require('_process'))
-},{"./CSSProperty":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/CSSProperty.js","./ExecutionEnvironment":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/ExecutionEnvironment.js","./camelizeStyleName":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/camelizeStyleName.js","./dangerousStyleValue":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/dangerousStyleValue.js","./hyphenateStyleName":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/hyphenateStyleName.js","./memoizeStringOnly":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/memoizeStringOnly.js","./warning":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/warning.js","_process":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/watchify/node_modules/browserify/node_modules/process/browser.js"}],"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/CallbackQueue.js":[function(require,module,exports){
+},{"./CSSProperty":8,"./ExecutionEnvironment":26,"./camelizeStyleName":105,"./dangerousStyleValue":111,"./hyphenateStyleName":130,"./memoizeStringOnly":141,"./warning":151,"_process":5}],10:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-2014, Facebook, Inc.
@@ -736,7 +1129,7 @@ PooledClass.addPoolingTo(CallbackQueue);
 module.exports = CallbackQueue;
 
 }).call(this,require('_process'))
-},{"./Object.assign":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/Object.assign.js","./PooledClass":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/PooledClass.js","./invariant":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/invariant.js","_process":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/watchify/node_modules/browserify/node_modules/process/browser.js"}],"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/ChangeEventPlugin.js":[function(require,module,exports){
+},{"./Object.assign":31,"./PooledClass":32,"./invariant":132,"_process":5}],11:[function(require,module,exports){
 /**
  * Copyright 2013-2014, Facebook, Inc.
  * All rights reserved.
@@ -1118,7 +1511,7 @@ var ChangeEventPlugin = {
 
 module.exports = ChangeEventPlugin;
 
-},{"./EventConstants":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/EventConstants.js","./EventPluginHub":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/EventPluginHub.js","./EventPropagators":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/EventPropagators.js","./ExecutionEnvironment":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/ExecutionEnvironment.js","./ReactUpdates":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/ReactUpdates.js","./SyntheticEvent":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/SyntheticEvent.js","./isEventSupported":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/isEventSupported.js","./isTextInputElement":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/isTextInputElement.js","./keyOf":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/keyOf.js"}],"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/ClientReactRootIndex.js":[function(require,module,exports){
+},{"./EventConstants":20,"./EventPluginHub":22,"./EventPropagators":25,"./ExecutionEnvironment":26,"./ReactUpdates":84,"./SyntheticEvent":92,"./isEventSupported":133,"./isTextInputElement":135,"./keyOf":139}],12:[function(require,module,exports){
 /**
  * Copyright 2013-2014, Facebook, Inc.
  * All rights reserved.
@@ -1143,7 +1536,7 @@ var ClientReactRootIndex = {
 
 module.exports = ClientReactRootIndex;
 
-},{}],"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/CompositionEventPlugin.js":[function(require,module,exports){
+},{}],13:[function(require,module,exports){
 /**
  * Copyright 2013-2014, Facebook, Inc.
  * All rights reserved.
@@ -1402,7 +1795,7 @@ var CompositionEventPlugin = {
 
 module.exports = CompositionEventPlugin;
 
-},{"./EventConstants":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/EventConstants.js","./EventPropagators":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/EventPropagators.js","./ExecutionEnvironment":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/ExecutionEnvironment.js","./ReactInputSelection":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/ReactInputSelection.js","./SyntheticCompositionEvent":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/SyntheticCompositionEvent.js","./getTextContentAccessor":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/getTextContentAccessor.js","./keyOf":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/keyOf.js"}],"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/DOMChildrenOperations.js":[function(require,module,exports){
+},{"./EventConstants":20,"./EventPropagators":25,"./ExecutionEnvironment":26,"./ReactInputSelection":64,"./SyntheticCompositionEvent":90,"./getTextContentAccessor":127,"./keyOf":139}],14:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-2014, Facebook, Inc.
@@ -1577,7 +1970,7 @@ var DOMChildrenOperations = {
 module.exports = DOMChildrenOperations;
 
 }).call(this,require('_process'))
-},{"./Danger":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/Danger.js","./ReactMultiChildUpdateTypes":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/ReactMultiChildUpdateTypes.js","./getTextContentAccessor":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/getTextContentAccessor.js","./invariant":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/invariant.js","_process":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/watchify/node_modules/browserify/node_modules/process/browser.js"}],"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/DOMProperty.js":[function(require,module,exports){
+},{"./Danger":17,"./ReactMultiChildUpdateTypes":70,"./getTextContentAccessor":127,"./invariant":132,"_process":5}],15:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-2014, Facebook, Inc.
@@ -1876,7 +2269,7 @@ var DOMProperty = {
 module.exports = DOMProperty;
 
 }).call(this,require('_process'))
-},{"./invariant":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/invariant.js","_process":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/watchify/node_modules/browserify/node_modules/process/browser.js"}],"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/DOMPropertyOperations.js":[function(require,module,exports){
+},{"./invariant":132,"_process":5}],16:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-2014, Facebook, Inc.
@@ -2073,7 +2466,7 @@ var DOMPropertyOperations = {
 module.exports = DOMPropertyOperations;
 
 }).call(this,require('_process'))
-},{"./DOMProperty":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/DOMProperty.js","./escapeTextForBrowser":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/escapeTextForBrowser.js","./memoizeStringOnly":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/memoizeStringOnly.js","./warning":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/warning.js","_process":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/watchify/node_modules/browserify/node_modules/process/browser.js"}],"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/Danger.js":[function(require,module,exports){
+},{"./DOMProperty":15,"./escapeTextForBrowser":115,"./memoizeStringOnly":141,"./warning":151,"_process":5}],17:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-2014, Facebook, Inc.
@@ -2259,7 +2652,7 @@ var Danger = {
 module.exports = Danger;
 
 }).call(this,require('_process'))
-},{"./ExecutionEnvironment":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/ExecutionEnvironment.js","./createNodesFromMarkup":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/createNodesFromMarkup.js","./emptyFunction":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/emptyFunction.js","./getMarkupWrap":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/getMarkupWrap.js","./invariant":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/invariant.js","_process":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/watchify/node_modules/browserify/node_modules/process/browser.js"}],"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/DefaultEventPluginOrder.js":[function(require,module,exports){
+},{"./ExecutionEnvironment":26,"./createNodesFromMarkup":109,"./emptyFunction":113,"./getMarkupWrap":124,"./invariant":132,"_process":5}],18:[function(require,module,exports){
 /**
  * Copyright 2013-2014, Facebook, Inc.
  * All rights reserved.
@@ -2299,7 +2692,7 @@ var DefaultEventPluginOrder = [
 
 module.exports = DefaultEventPluginOrder;
 
-},{"./keyOf":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/keyOf.js"}],"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/EnterLeaveEventPlugin.js":[function(require,module,exports){
+},{"./keyOf":139}],19:[function(require,module,exports){
 /**
  * Copyright 2013-2014, Facebook, Inc.
  * All rights reserved.
@@ -2439,7 +2832,7 @@ var EnterLeaveEventPlugin = {
 
 module.exports = EnterLeaveEventPlugin;
 
-},{"./EventConstants":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/EventConstants.js","./EventPropagators":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/EventPropagators.js","./ReactMount":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/ReactMount.js","./SyntheticMouseEvent":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/SyntheticMouseEvent.js","./keyOf":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/keyOf.js"}],"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/EventConstants.js":[function(require,module,exports){
+},{"./EventConstants":20,"./EventPropagators":25,"./ReactMount":68,"./SyntheticMouseEvent":96,"./keyOf":139}],20:[function(require,module,exports){
 /**
  * Copyright 2013-2014, Facebook, Inc.
  * All rights reserved.
@@ -2511,7 +2904,7 @@ var EventConstants = {
 
 module.exports = EventConstants;
 
-},{"./keyMirror":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/keyMirror.js"}],"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/EventListener.js":[function(require,module,exports){
+},{"./keyMirror":138}],21:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-2014 Facebook, Inc.
@@ -2601,7 +2994,7 @@ var EventListener = {
 module.exports = EventListener;
 
 }).call(this,require('_process'))
-},{"./emptyFunction":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/emptyFunction.js","_process":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/watchify/node_modules/browserify/node_modules/process/browser.js"}],"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/EventPluginHub.js":[function(require,module,exports){
+},{"./emptyFunction":113,"_process":5}],22:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-2014, Facebook, Inc.
@@ -2877,7 +3270,7 @@ var EventPluginHub = {
 module.exports = EventPluginHub;
 
 }).call(this,require('_process'))
-},{"./EventPluginRegistry":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/EventPluginRegistry.js","./EventPluginUtils":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/EventPluginUtils.js","./accumulateInto":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/accumulateInto.js","./forEachAccumulated":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/forEachAccumulated.js","./invariant":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/invariant.js","_process":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/watchify/node_modules/browserify/node_modules/process/browser.js"}],"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/EventPluginRegistry.js":[function(require,module,exports){
+},{"./EventPluginRegistry":23,"./EventPluginUtils":24,"./accumulateInto":102,"./forEachAccumulated":118,"./invariant":132,"_process":5}],23:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-2014, Facebook, Inc.
@@ -3157,7 +3550,7 @@ var EventPluginRegistry = {
 module.exports = EventPluginRegistry;
 
 }).call(this,require('_process'))
-},{"./invariant":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/invariant.js","_process":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/watchify/node_modules/browserify/node_modules/process/browser.js"}],"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/EventPluginUtils.js":[function(require,module,exports){
+},{"./invariant":132,"_process":5}],24:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-2014, Facebook, Inc.
@@ -3378,7 +3771,7 @@ var EventPluginUtils = {
 module.exports = EventPluginUtils;
 
 }).call(this,require('_process'))
-},{"./EventConstants":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/EventConstants.js","./invariant":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/invariant.js","_process":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/watchify/node_modules/browserify/node_modules/process/browser.js"}],"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/EventPropagators.js":[function(require,module,exports){
+},{"./EventConstants":20,"./invariant":132,"_process":5}],25:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-2014, Facebook, Inc.
@@ -3520,7 +3913,7 @@ var EventPropagators = {
 module.exports = EventPropagators;
 
 }).call(this,require('_process'))
-},{"./EventConstants":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/EventConstants.js","./EventPluginHub":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/EventPluginHub.js","./accumulateInto":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/accumulateInto.js","./forEachAccumulated":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/forEachAccumulated.js","_process":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/watchify/node_modules/browserify/node_modules/process/browser.js"}],"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/ExecutionEnvironment.js":[function(require,module,exports){
+},{"./EventConstants":20,"./EventPluginHub":22,"./accumulateInto":102,"./forEachAccumulated":118,"_process":5}],26:[function(require,module,exports){
 /**
  * Copyright 2013-2014, Facebook, Inc.
  * All rights reserved.
@@ -3565,7 +3958,7 @@ var ExecutionEnvironment = {
 
 module.exports = ExecutionEnvironment;
 
-},{}],"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/HTMLDOMPropertyConfig.js":[function(require,module,exports){
+},{}],27:[function(require,module,exports){
 /**
  * Copyright 2013-2014, Facebook, Inc.
  * All rights reserved.
@@ -3757,7 +4150,7 @@ var HTMLDOMPropertyConfig = {
 
 module.exports = HTMLDOMPropertyConfig;
 
-},{"./DOMProperty":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/DOMProperty.js","./ExecutionEnvironment":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/ExecutionEnvironment.js"}],"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/LinkedValueUtils.js":[function(require,module,exports){
+},{"./DOMProperty":15,"./ExecutionEnvironment":26}],28:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-2014, Facebook, Inc.
@@ -3913,7 +4306,7 @@ var LinkedValueUtils = {
 module.exports = LinkedValueUtils;
 
 }).call(this,require('_process'))
-},{"./ReactPropTypes":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/ReactPropTypes.js","./invariant":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/invariant.js","_process":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/watchify/node_modules/browserify/node_modules/process/browser.js"}],"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/LocalEventTrapMixin.js":[function(require,module,exports){
+},{"./ReactPropTypes":77,"./invariant":132,"_process":5}],29:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2014, Facebook, Inc.
@@ -3963,7 +4356,7 @@ var LocalEventTrapMixin = {
 module.exports = LocalEventTrapMixin;
 
 }).call(this,require('_process'))
-},{"./ReactBrowserEventEmitter":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/ReactBrowserEventEmitter.js","./accumulateInto":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/accumulateInto.js","./forEachAccumulated":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/forEachAccumulated.js","./invariant":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/invariant.js","_process":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/watchify/node_modules/browserify/node_modules/process/browser.js"}],"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/MobileSafariClickEventPlugin.js":[function(require,module,exports){
+},{"./ReactBrowserEventEmitter":35,"./accumulateInto":102,"./forEachAccumulated":118,"./invariant":132,"_process":5}],30:[function(require,module,exports){
 /**
  * Copyright 2013-2014, Facebook, Inc.
  * All rights reserved.
@@ -4021,7 +4414,7 @@ var MobileSafariClickEventPlugin = {
 
 module.exports = MobileSafariClickEventPlugin;
 
-},{"./EventConstants":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/EventConstants.js","./emptyFunction":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/emptyFunction.js"}],"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/Object.assign.js":[function(require,module,exports){
+},{"./EventConstants":20,"./emptyFunction":113}],31:[function(require,module,exports){
 /**
  * Copyright 2014, Facebook, Inc.
  * All rights reserved.
@@ -4068,7 +4461,7 @@ function assign(target, sources) {
 
 module.exports = assign;
 
-},{}],"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/PooledClass.js":[function(require,module,exports){
+},{}],32:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-2014, Facebook, Inc.
@@ -4184,7 +4577,7 @@ var PooledClass = {
 module.exports = PooledClass;
 
 }).call(this,require('_process'))
-},{"./invariant":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/invariant.js","_process":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/watchify/node_modules/browserify/node_modules/process/browser.js"}],"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/React.js":[function(require,module,exports){
+},{"./invariant":132,"_process":5}],33:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-2014, Facebook, Inc.
@@ -4372,7 +4765,7 @@ React.version = '0.12.2';
 module.exports = React;
 
 }).call(this,require('_process'))
-},{"./DOMPropertyOperations":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/DOMPropertyOperations.js","./EventPluginUtils":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/EventPluginUtils.js","./ExecutionEnvironment":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/ExecutionEnvironment.js","./Object.assign":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/Object.assign.js","./ReactChildren":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/ReactChildren.js","./ReactComponent":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/ReactComponent.js","./ReactCompositeComponent":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/ReactCompositeComponent.js","./ReactContext":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/ReactContext.js","./ReactCurrentOwner":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/ReactCurrentOwner.js","./ReactDOM":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/ReactDOM.js","./ReactDOMComponent":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/ReactDOMComponent.js","./ReactDefaultInjection":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/ReactDefaultInjection.js","./ReactElement":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/ReactElement.js","./ReactElementValidator":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/ReactElementValidator.js","./ReactInstanceHandles":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/ReactInstanceHandles.js","./ReactLegacyElement":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/ReactLegacyElement.js","./ReactMount":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/ReactMount.js","./ReactMultiChild":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/ReactMultiChild.js","./ReactPerf":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/ReactPerf.js","./ReactPropTypes":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/ReactPropTypes.js","./ReactServerRendering":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/ReactServerRendering.js","./ReactTextComponent":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/ReactTextComponent.js","./deprecated":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/deprecated.js","./onlyChild":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/onlyChild.js","_process":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/watchify/node_modules/browserify/node_modules/process/browser.js"}],"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/ReactBrowserComponentMixin.js":[function(require,module,exports){
+},{"./DOMPropertyOperations":16,"./EventPluginUtils":24,"./ExecutionEnvironment":26,"./Object.assign":31,"./ReactChildren":36,"./ReactComponent":37,"./ReactCompositeComponent":39,"./ReactContext":40,"./ReactCurrentOwner":41,"./ReactDOM":42,"./ReactDOMComponent":44,"./ReactDefaultInjection":54,"./ReactElement":57,"./ReactElementValidator":58,"./ReactInstanceHandles":65,"./ReactLegacyElement":66,"./ReactMount":68,"./ReactMultiChild":69,"./ReactPerf":73,"./ReactPropTypes":77,"./ReactServerRendering":81,"./ReactTextComponent":83,"./deprecated":112,"./onlyChild":143,"_process":5}],34:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-2014, Facebook, Inc.
@@ -4415,7 +4808,7 @@ var ReactBrowserComponentMixin = {
 module.exports = ReactBrowserComponentMixin;
 
 }).call(this,require('_process'))
-},{"./ReactEmptyComponent":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/ReactEmptyComponent.js","./ReactMount":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/ReactMount.js","./invariant":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/invariant.js","_process":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/watchify/node_modules/browserify/node_modules/process/browser.js"}],"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/ReactBrowserEventEmitter.js":[function(require,module,exports){
+},{"./ReactEmptyComponent":59,"./ReactMount":68,"./invariant":132,"_process":5}],35:[function(require,module,exports){
 /**
  * Copyright 2013-2014, Facebook, Inc.
  * All rights reserved.
@@ -4770,7 +5163,7 @@ var ReactBrowserEventEmitter = assign({}, ReactEventEmitterMixin, {
 
 module.exports = ReactBrowserEventEmitter;
 
-},{"./EventConstants":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/EventConstants.js","./EventPluginHub":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/EventPluginHub.js","./EventPluginRegistry":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/EventPluginRegistry.js","./Object.assign":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/Object.assign.js","./ReactEventEmitterMixin":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/ReactEventEmitterMixin.js","./ViewportMetrics":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/ViewportMetrics.js","./isEventSupported":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/isEventSupported.js"}],"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/ReactChildren.js":[function(require,module,exports){
+},{"./EventConstants":20,"./EventPluginHub":22,"./EventPluginRegistry":23,"./Object.assign":31,"./ReactEventEmitterMixin":61,"./ViewportMetrics":101,"./isEventSupported":133}],36:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-2014, Facebook, Inc.
@@ -4920,7 +5313,7 @@ var ReactChildren = {
 module.exports = ReactChildren;
 
 }).call(this,require('_process'))
-},{"./PooledClass":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/PooledClass.js","./traverseAllChildren":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/traverseAllChildren.js","./warning":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/warning.js","_process":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/watchify/node_modules/browserify/node_modules/process/browser.js"}],"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/ReactComponent.js":[function(require,module,exports){
+},{"./PooledClass":32,"./traverseAllChildren":150,"./warning":151,"_process":5}],37:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-2014, Facebook, Inc.
@@ -5363,7 +5756,7 @@ var ReactComponent = {
 module.exports = ReactComponent;
 
 }).call(this,require('_process'))
-},{"./Object.assign":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/Object.assign.js","./ReactElement":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/ReactElement.js","./ReactOwner":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/ReactOwner.js","./ReactUpdates":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/ReactUpdates.js","./invariant":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/invariant.js","./keyMirror":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/keyMirror.js","_process":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/watchify/node_modules/browserify/node_modules/process/browser.js"}],"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/ReactComponentBrowserEnvironment.js":[function(require,module,exports){
+},{"./Object.assign":31,"./ReactElement":57,"./ReactOwner":72,"./ReactUpdates":84,"./invariant":132,"./keyMirror":138,"_process":5}],38:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-2014, Facebook, Inc.
@@ -5485,7 +5878,7 @@ var ReactComponentBrowserEnvironment = {
 module.exports = ReactComponentBrowserEnvironment;
 
 }).call(this,require('_process'))
-},{"./ReactDOMIDOperations":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/ReactDOMIDOperations.js","./ReactMarkupChecksum":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/ReactMarkupChecksum.js","./ReactMount":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/ReactMount.js","./ReactPerf":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/ReactPerf.js","./ReactReconcileTransaction":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/ReactReconcileTransaction.js","./getReactRootElementInContainer":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/getReactRootElementInContainer.js","./invariant":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/invariant.js","./setInnerHTML":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/setInnerHTML.js","_process":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/watchify/node_modules/browserify/node_modules/process/browser.js"}],"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/ReactCompositeComponent.js":[function(require,module,exports){
+},{"./ReactDOMIDOperations":46,"./ReactMarkupChecksum":67,"./ReactMount":68,"./ReactPerf":73,"./ReactReconcileTransaction":79,"./getReactRootElementInContainer":126,"./invariant":132,"./setInnerHTML":146,"_process":5}],39:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-2014, Facebook, Inc.
@@ -6925,7 +7318,7 @@ var ReactCompositeComponent = {
 module.exports = ReactCompositeComponent;
 
 }).call(this,require('_process'))
-},{"./Object.assign":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/Object.assign.js","./ReactComponent":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/ReactComponent.js","./ReactContext":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/ReactContext.js","./ReactCurrentOwner":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/ReactCurrentOwner.js","./ReactElement":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/ReactElement.js","./ReactElementValidator":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/ReactElementValidator.js","./ReactEmptyComponent":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/ReactEmptyComponent.js","./ReactErrorUtils":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/ReactErrorUtils.js","./ReactLegacyElement":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/ReactLegacyElement.js","./ReactOwner":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/ReactOwner.js","./ReactPerf":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/ReactPerf.js","./ReactPropTransferer":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/ReactPropTransferer.js","./ReactPropTypeLocationNames":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/ReactPropTypeLocationNames.js","./ReactPropTypeLocations":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/ReactPropTypeLocations.js","./ReactUpdates":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/ReactUpdates.js","./instantiateReactComponent":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/instantiateReactComponent.js","./invariant":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/invariant.js","./keyMirror":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/keyMirror.js","./keyOf":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/keyOf.js","./mapObject":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/mapObject.js","./monitorCodeUse":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/monitorCodeUse.js","./shouldUpdateReactComponent":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/shouldUpdateReactComponent.js","./warning":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/warning.js","_process":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/watchify/node_modules/browserify/node_modules/process/browser.js"}],"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/ReactContext.js":[function(require,module,exports){
+},{"./Object.assign":31,"./ReactComponent":37,"./ReactContext":40,"./ReactCurrentOwner":41,"./ReactElement":57,"./ReactElementValidator":58,"./ReactEmptyComponent":59,"./ReactErrorUtils":60,"./ReactLegacyElement":66,"./ReactOwner":72,"./ReactPerf":73,"./ReactPropTransferer":74,"./ReactPropTypeLocationNames":75,"./ReactPropTypeLocations":76,"./ReactUpdates":84,"./instantiateReactComponent":131,"./invariant":132,"./keyMirror":138,"./keyOf":139,"./mapObject":140,"./monitorCodeUse":142,"./shouldUpdateReactComponent":148,"./warning":151,"_process":5}],40:[function(require,module,exports){
 /**
  * Copyright 2013-2014, Facebook, Inc.
  * All rights reserved.
@@ -6987,7 +7380,7 @@ var ReactContext = {
 
 module.exports = ReactContext;
 
-},{"./Object.assign":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/Object.assign.js"}],"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/ReactCurrentOwner.js":[function(require,module,exports){
+},{"./Object.assign":31}],41:[function(require,module,exports){
 /**
  * Copyright 2013-2014, Facebook, Inc.
  * All rights reserved.
@@ -7021,7 +7414,7 @@ var ReactCurrentOwner = {
 
 module.exports = ReactCurrentOwner;
 
-},{}],"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/ReactDOM.js":[function(require,module,exports){
+},{}],42:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-2014, Facebook, Inc.
@@ -7204,7 +7597,7 @@ var ReactDOM = mapObject({
 module.exports = ReactDOM;
 
 }).call(this,require('_process'))
-},{"./ReactElement":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/ReactElement.js","./ReactElementValidator":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/ReactElementValidator.js","./ReactLegacyElement":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/ReactLegacyElement.js","./mapObject":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/mapObject.js","_process":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/watchify/node_modules/browserify/node_modules/process/browser.js"}],"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/ReactDOMButton.js":[function(require,module,exports){
+},{"./ReactElement":57,"./ReactElementValidator":58,"./ReactLegacyElement":66,"./mapObject":140,"_process":5}],43:[function(require,module,exports){
 /**
  * Copyright 2013-2014, Facebook, Inc.
  * All rights reserved.
@@ -7269,7 +7662,7 @@ var ReactDOMButton = ReactCompositeComponent.createClass({
 
 module.exports = ReactDOMButton;
 
-},{"./AutoFocusMixin":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/AutoFocusMixin.js","./ReactBrowserComponentMixin":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/ReactBrowserComponentMixin.js","./ReactCompositeComponent":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/ReactCompositeComponent.js","./ReactDOM":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/ReactDOM.js","./ReactElement":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/ReactElement.js","./keyMirror":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/keyMirror.js"}],"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/ReactDOMComponent.js":[function(require,module,exports){
+},{"./AutoFocusMixin":6,"./ReactBrowserComponentMixin":34,"./ReactCompositeComponent":39,"./ReactDOM":42,"./ReactElement":57,"./keyMirror":138}],44:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-2014, Facebook, Inc.
@@ -7756,7 +8149,7 @@ assign(
 module.exports = ReactDOMComponent;
 
 }).call(this,require('_process'))
-},{"./CSSPropertyOperations":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/CSSPropertyOperations.js","./DOMProperty":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/DOMProperty.js","./DOMPropertyOperations":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/DOMPropertyOperations.js","./Object.assign":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/Object.assign.js","./ReactBrowserComponentMixin":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/ReactBrowserComponentMixin.js","./ReactBrowserEventEmitter":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/ReactBrowserEventEmitter.js","./ReactComponent":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/ReactComponent.js","./ReactMount":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/ReactMount.js","./ReactMultiChild":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/ReactMultiChild.js","./ReactPerf":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/ReactPerf.js","./escapeTextForBrowser":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/escapeTextForBrowser.js","./invariant":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/invariant.js","./isEventSupported":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/isEventSupported.js","./keyOf":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/keyOf.js","./monitorCodeUse":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/monitorCodeUse.js","_process":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/watchify/node_modules/browserify/node_modules/process/browser.js"}],"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/ReactDOMForm.js":[function(require,module,exports){
+},{"./CSSPropertyOperations":9,"./DOMProperty":15,"./DOMPropertyOperations":16,"./Object.assign":31,"./ReactBrowserComponentMixin":34,"./ReactBrowserEventEmitter":35,"./ReactComponent":37,"./ReactMount":68,"./ReactMultiChild":69,"./ReactPerf":73,"./escapeTextForBrowser":115,"./invariant":132,"./isEventSupported":133,"./keyOf":139,"./monitorCodeUse":142,"_process":5}],45:[function(require,module,exports){
 /**
  * Copyright 2013-2014, Facebook, Inc.
  * All rights reserved.
@@ -7806,7 +8199,7 @@ var ReactDOMForm = ReactCompositeComponent.createClass({
 
 module.exports = ReactDOMForm;
 
-},{"./EventConstants":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/EventConstants.js","./LocalEventTrapMixin":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/LocalEventTrapMixin.js","./ReactBrowserComponentMixin":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/ReactBrowserComponentMixin.js","./ReactCompositeComponent":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/ReactCompositeComponent.js","./ReactDOM":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/ReactDOM.js","./ReactElement":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/ReactElement.js"}],"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/ReactDOMIDOperations.js":[function(require,module,exports){
+},{"./EventConstants":20,"./LocalEventTrapMixin":29,"./ReactBrowserComponentMixin":34,"./ReactCompositeComponent":39,"./ReactDOM":42,"./ReactElement":57}],46:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-2014, Facebook, Inc.
@@ -7992,7 +8385,7 @@ var ReactDOMIDOperations = {
 module.exports = ReactDOMIDOperations;
 
 }).call(this,require('_process'))
-},{"./CSSPropertyOperations":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/CSSPropertyOperations.js","./DOMChildrenOperations":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/DOMChildrenOperations.js","./DOMPropertyOperations":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/DOMPropertyOperations.js","./ReactMount":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/ReactMount.js","./ReactPerf":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/ReactPerf.js","./invariant":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/invariant.js","./setInnerHTML":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/setInnerHTML.js","_process":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/watchify/node_modules/browserify/node_modules/process/browser.js"}],"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/ReactDOMImg.js":[function(require,module,exports){
+},{"./CSSPropertyOperations":9,"./DOMChildrenOperations":14,"./DOMPropertyOperations":16,"./ReactMount":68,"./ReactPerf":73,"./invariant":132,"./setInnerHTML":146,"_process":5}],47:[function(require,module,exports){
 /**
  * Copyright 2013-2014, Facebook, Inc.
  * All rights reserved.
@@ -8040,7 +8433,7 @@ var ReactDOMImg = ReactCompositeComponent.createClass({
 
 module.exports = ReactDOMImg;
 
-},{"./EventConstants":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/EventConstants.js","./LocalEventTrapMixin":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/LocalEventTrapMixin.js","./ReactBrowserComponentMixin":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/ReactBrowserComponentMixin.js","./ReactCompositeComponent":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/ReactCompositeComponent.js","./ReactDOM":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/ReactDOM.js","./ReactElement":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/ReactElement.js"}],"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/ReactDOMInput.js":[function(require,module,exports){
+},{"./EventConstants":20,"./LocalEventTrapMixin":29,"./ReactBrowserComponentMixin":34,"./ReactCompositeComponent":39,"./ReactDOM":42,"./ReactElement":57}],48:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-2014, Facebook, Inc.
@@ -8218,7 +8611,7 @@ var ReactDOMInput = ReactCompositeComponent.createClass({
 module.exports = ReactDOMInput;
 
 }).call(this,require('_process'))
-},{"./AutoFocusMixin":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/AutoFocusMixin.js","./DOMPropertyOperations":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/DOMPropertyOperations.js","./LinkedValueUtils":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/LinkedValueUtils.js","./Object.assign":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/Object.assign.js","./ReactBrowserComponentMixin":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/ReactBrowserComponentMixin.js","./ReactCompositeComponent":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/ReactCompositeComponent.js","./ReactDOM":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/ReactDOM.js","./ReactElement":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/ReactElement.js","./ReactMount":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/ReactMount.js","./ReactUpdates":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/ReactUpdates.js","./invariant":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/invariant.js","_process":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/watchify/node_modules/browserify/node_modules/process/browser.js"}],"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/ReactDOMOption.js":[function(require,module,exports){
+},{"./AutoFocusMixin":6,"./DOMPropertyOperations":16,"./LinkedValueUtils":28,"./Object.assign":31,"./ReactBrowserComponentMixin":34,"./ReactCompositeComponent":39,"./ReactDOM":42,"./ReactElement":57,"./ReactMount":68,"./ReactUpdates":84,"./invariant":132,"_process":5}],49:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-2014, Facebook, Inc.
@@ -8271,7 +8664,7 @@ var ReactDOMOption = ReactCompositeComponent.createClass({
 module.exports = ReactDOMOption;
 
 }).call(this,require('_process'))
-},{"./ReactBrowserComponentMixin":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/ReactBrowserComponentMixin.js","./ReactCompositeComponent":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/ReactCompositeComponent.js","./ReactDOM":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/ReactDOM.js","./ReactElement":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/ReactElement.js","./warning":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/warning.js","_process":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/watchify/node_modules/browserify/node_modules/process/browser.js"}],"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/ReactDOMSelect.js":[function(require,module,exports){
+},{"./ReactBrowserComponentMixin":34,"./ReactCompositeComponent":39,"./ReactDOM":42,"./ReactElement":57,"./warning":151,"_process":5}],50:[function(require,module,exports){
 /**
  * Copyright 2013-2014, Facebook, Inc.
  * All rights reserved.
@@ -8455,7 +8848,7 @@ var ReactDOMSelect = ReactCompositeComponent.createClass({
 
 module.exports = ReactDOMSelect;
 
-},{"./AutoFocusMixin":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/AutoFocusMixin.js","./LinkedValueUtils":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/LinkedValueUtils.js","./Object.assign":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/Object.assign.js","./ReactBrowserComponentMixin":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/ReactBrowserComponentMixin.js","./ReactCompositeComponent":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/ReactCompositeComponent.js","./ReactDOM":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/ReactDOM.js","./ReactElement":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/ReactElement.js","./ReactUpdates":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/ReactUpdates.js"}],"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/ReactDOMSelection.js":[function(require,module,exports){
+},{"./AutoFocusMixin":6,"./LinkedValueUtils":28,"./Object.assign":31,"./ReactBrowserComponentMixin":34,"./ReactCompositeComponent":39,"./ReactDOM":42,"./ReactElement":57,"./ReactUpdates":84}],51:[function(require,module,exports){
 /**
  * Copyright 2013-2014, Facebook, Inc.
  * All rights reserved.
@@ -8664,7 +9057,7 @@ var ReactDOMSelection = {
 
 module.exports = ReactDOMSelection;
 
-},{"./ExecutionEnvironment":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/ExecutionEnvironment.js","./getNodeForCharacterOffset":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/getNodeForCharacterOffset.js","./getTextContentAccessor":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/getTextContentAccessor.js"}],"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/ReactDOMTextarea.js":[function(require,module,exports){
+},{"./ExecutionEnvironment":26,"./getNodeForCharacterOffset":125,"./getTextContentAccessor":127}],52:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-2014, Facebook, Inc.
@@ -8805,7 +9198,7 @@ var ReactDOMTextarea = ReactCompositeComponent.createClass({
 module.exports = ReactDOMTextarea;
 
 }).call(this,require('_process'))
-},{"./AutoFocusMixin":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/AutoFocusMixin.js","./DOMPropertyOperations":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/DOMPropertyOperations.js","./LinkedValueUtils":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/LinkedValueUtils.js","./Object.assign":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/Object.assign.js","./ReactBrowserComponentMixin":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/ReactBrowserComponentMixin.js","./ReactCompositeComponent":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/ReactCompositeComponent.js","./ReactDOM":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/ReactDOM.js","./ReactElement":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/ReactElement.js","./ReactUpdates":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/ReactUpdates.js","./invariant":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/invariant.js","./warning":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/warning.js","_process":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/watchify/node_modules/browserify/node_modules/process/browser.js"}],"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/ReactDefaultBatchingStrategy.js":[function(require,module,exports){
+},{"./AutoFocusMixin":6,"./DOMPropertyOperations":16,"./LinkedValueUtils":28,"./Object.assign":31,"./ReactBrowserComponentMixin":34,"./ReactCompositeComponent":39,"./ReactDOM":42,"./ReactElement":57,"./ReactUpdates":84,"./invariant":132,"./warning":151,"_process":5}],53:[function(require,module,exports){
 /**
  * Copyright 2013-2014, Facebook, Inc.
  * All rights reserved.
@@ -8878,7 +9271,7 @@ var ReactDefaultBatchingStrategy = {
 
 module.exports = ReactDefaultBatchingStrategy;
 
-},{"./Object.assign":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/Object.assign.js","./ReactUpdates":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/ReactUpdates.js","./Transaction":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/Transaction.js","./emptyFunction":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/emptyFunction.js"}],"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/ReactDefaultInjection.js":[function(require,module,exports){
+},{"./Object.assign":31,"./ReactUpdates":84,"./Transaction":100,"./emptyFunction":113}],54:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-2014, Facebook, Inc.
@@ -9007,7 +9400,7 @@ module.exports = {
 };
 
 }).call(this,require('_process'))
-},{"./BeforeInputEventPlugin":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/BeforeInputEventPlugin.js","./ChangeEventPlugin":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/ChangeEventPlugin.js","./ClientReactRootIndex":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/ClientReactRootIndex.js","./CompositionEventPlugin":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/CompositionEventPlugin.js","./DefaultEventPluginOrder":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/DefaultEventPluginOrder.js","./EnterLeaveEventPlugin":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/EnterLeaveEventPlugin.js","./ExecutionEnvironment":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/ExecutionEnvironment.js","./HTMLDOMPropertyConfig":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/HTMLDOMPropertyConfig.js","./MobileSafariClickEventPlugin":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/MobileSafariClickEventPlugin.js","./ReactBrowserComponentMixin":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/ReactBrowserComponentMixin.js","./ReactComponentBrowserEnvironment":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/ReactComponentBrowserEnvironment.js","./ReactDOMButton":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/ReactDOMButton.js","./ReactDOMComponent":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/ReactDOMComponent.js","./ReactDOMForm":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/ReactDOMForm.js","./ReactDOMImg":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/ReactDOMImg.js","./ReactDOMInput":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/ReactDOMInput.js","./ReactDOMOption":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/ReactDOMOption.js","./ReactDOMSelect":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/ReactDOMSelect.js","./ReactDOMTextarea":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/ReactDOMTextarea.js","./ReactDefaultBatchingStrategy":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/ReactDefaultBatchingStrategy.js","./ReactDefaultPerf":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/ReactDefaultPerf.js","./ReactEventListener":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/ReactEventListener.js","./ReactInjection":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/ReactInjection.js","./ReactInstanceHandles":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/ReactInstanceHandles.js","./ReactMount":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/ReactMount.js","./SVGDOMPropertyConfig":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/SVGDOMPropertyConfig.js","./SelectEventPlugin":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/SelectEventPlugin.js","./ServerReactRootIndex":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/ServerReactRootIndex.js","./SimpleEventPlugin":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/SimpleEventPlugin.js","./createFullPageComponent":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/createFullPageComponent.js","_process":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/watchify/node_modules/browserify/node_modules/process/browser.js"}],"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/ReactDefaultPerf.js":[function(require,module,exports){
+},{"./BeforeInputEventPlugin":7,"./ChangeEventPlugin":11,"./ClientReactRootIndex":12,"./CompositionEventPlugin":13,"./DefaultEventPluginOrder":18,"./EnterLeaveEventPlugin":19,"./ExecutionEnvironment":26,"./HTMLDOMPropertyConfig":27,"./MobileSafariClickEventPlugin":30,"./ReactBrowserComponentMixin":34,"./ReactComponentBrowserEnvironment":38,"./ReactDOMButton":43,"./ReactDOMComponent":44,"./ReactDOMForm":45,"./ReactDOMImg":47,"./ReactDOMInput":48,"./ReactDOMOption":49,"./ReactDOMSelect":50,"./ReactDOMTextarea":52,"./ReactDefaultBatchingStrategy":53,"./ReactDefaultPerf":55,"./ReactEventListener":62,"./ReactInjection":63,"./ReactInstanceHandles":65,"./ReactMount":68,"./SVGDOMPropertyConfig":85,"./SelectEventPlugin":86,"./ServerReactRootIndex":87,"./SimpleEventPlugin":88,"./createFullPageComponent":108,"_process":5}],55:[function(require,module,exports){
 /**
  * Copyright 2013-2014, Facebook, Inc.
  * All rights reserved.
@@ -9267,7 +9660,7 @@ var ReactDefaultPerf = {
 
 module.exports = ReactDefaultPerf;
 
-},{"./DOMProperty":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/DOMProperty.js","./ReactDefaultPerfAnalysis":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/ReactDefaultPerfAnalysis.js","./ReactMount":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/ReactMount.js","./ReactPerf":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/ReactPerf.js","./performanceNow":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/performanceNow.js"}],"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/ReactDefaultPerfAnalysis.js":[function(require,module,exports){
+},{"./DOMProperty":15,"./ReactDefaultPerfAnalysis":56,"./ReactMount":68,"./ReactPerf":73,"./performanceNow":145}],56:[function(require,module,exports){
 /**
  * Copyright 2013-2014, Facebook, Inc.
  * All rights reserved.
@@ -9473,7 +9866,7 @@ var ReactDefaultPerfAnalysis = {
 
 module.exports = ReactDefaultPerfAnalysis;
 
-},{"./Object.assign":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/Object.assign.js"}],"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/ReactElement.js":[function(require,module,exports){
+},{"./Object.assign":31}],57:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2014, Facebook, Inc.
@@ -9719,7 +10112,7 @@ ReactElement.isValidElement = function(object) {
 module.exports = ReactElement;
 
 }).call(this,require('_process'))
-},{"./ReactContext":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/ReactContext.js","./ReactCurrentOwner":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/ReactCurrentOwner.js","./warning":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/warning.js","_process":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/watchify/node_modules/browserify/node_modules/process/browser.js"}],"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/ReactElementValidator.js":[function(require,module,exports){
+},{"./ReactContext":40,"./ReactCurrentOwner":41,"./warning":151,"_process":5}],58:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2014, Facebook, Inc.
@@ -10001,7 +10394,7 @@ var ReactElementValidator = {
 module.exports = ReactElementValidator;
 
 }).call(this,require('_process'))
-},{"./ReactCurrentOwner":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/ReactCurrentOwner.js","./ReactElement":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/ReactElement.js","./ReactPropTypeLocations":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/ReactPropTypeLocations.js","./monitorCodeUse":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/monitorCodeUse.js","./warning":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/warning.js","_process":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/watchify/node_modules/browserify/node_modules/process/browser.js"}],"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/ReactEmptyComponent.js":[function(require,module,exports){
+},{"./ReactCurrentOwner":41,"./ReactElement":57,"./ReactPropTypeLocations":76,"./monitorCodeUse":142,"./warning":151,"_process":5}],59:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2014, Facebook, Inc.
@@ -10078,7 +10471,7 @@ var ReactEmptyComponent = {
 module.exports = ReactEmptyComponent;
 
 }).call(this,require('_process'))
-},{"./ReactElement":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/ReactElement.js","./invariant":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/invariant.js","_process":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/watchify/node_modules/browserify/node_modules/process/browser.js"}],"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/ReactErrorUtils.js":[function(require,module,exports){
+},{"./ReactElement":57,"./invariant":132,"_process":5}],60:[function(require,module,exports){
 /**
  * Copyright 2013-2014, Facebook, Inc.
  * All rights reserved.
@@ -10110,7 +10503,7 @@ var ReactErrorUtils = {
 
 module.exports = ReactErrorUtils;
 
-},{}],"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/ReactEventEmitterMixin.js":[function(require,module,exports){
+},{}],61:[function(require,module,exports){
 /**
  * Copyright 2013-2014, Facebook, Inc.
  * All rights reserved.
@@ -10160,7 +10553,7 @@ var ReactEventEmitterMixin = {
 
 module.exports = ReactEventEmitterMixin;
 
-},{"./EventPluginHub":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/EventPluginHub.js"}],"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/ReactEventListener.js":[function(require,module,exports){
+},{"./EventPluginHub":22}],62:[function(require,module,exports){
 /**
  * Copyright 2013-2014, Facebook, Inc.
  * All rights reserved.
@@ -10344,7 +10737,7 @@ var ReactEventListener = {
 
 module.exports = ReactEventListener;
 
-},{"./EventListener":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/EventListener.js","./ExecutionEnvironment":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/ExecutionEnvironment.js","./Object.assign":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/Object.assign.js","./PooledClass":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/PooledClass.js","./ReactInstanceHandles":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/ReactInstanceHandles.js","./ReactMount":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/ReactMount.js","./ReactUpdates":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/ReactUpdates.js","./getEventTarget":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/getEventTarget.js","./getUnboundedScrollPosition":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/getUnboundedScrollPosition.js"}],"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/ReactInjection.js":[function(require,module,exports){
+},{"./EventListener":21,"./ExecutionEnvironment":26,"./Object.assign":31,"./PooledClass":32,"./ReactInstanceHandles":65,"./ReactMount":68,"./ReactUpdates":84,"./getEventTarget":123,"./getUnboundedScrollPosition":128}],63:[function(require,module,exports){
 /**
  * Copyright 2013-2014, Facebook, Inc.
  * All rights reserved.
@@ -10384,7 +10777,7 @@ var ReactInjection = {
 
 module.exports = ReactInjection;
 
-},{"./DOMProperty":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/DOMProperty.js","./EventPluginHub":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/EventPluginHub.js","./ReactBrowserEventEmitter":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/ReactBrowserEventEmitter.js","./ReactComponent":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/ReactComponent.js","./ReactCompositeComponent":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/ReactCompositeComponent.js","./ReactEmptyComponent":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/ReactEmptyComponent.js","./ReactNativeComponent":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/ReactNativeComponent.js","./ReactPerf":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/ReactPerf.js","./ReactRootIndex":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/ReactRootIndex.js","./ReactUpdates":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/ReactUpdates.js"}],"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/ReactInputSelection.js":[function(require,module,exports){
+},{"./DOMProperty":15,"./EventPluginHub":22,"./ReactBrowserEventEmitter":35,"./ReactComponent":37,"./ReactCompositeComponent":39,"./ReactEmptyComponent":59,"./ReactNativeComponent":71,"./ReactPerf":73,"./ReactRootIndex":80,"./ReactUpdates":84}],64:[function(require,module,exports){
 /**
  * Copyright 2013-2014, Facebook, Inc.
  * All rights reserved.
@@ -10520,7 +10913,7 @@ var ReactInputSelection = {
 
 module.exports = ReactInputSelection;
 
-},{"./ReactDOMSelection":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/ReactDOMSelection.js","./containsNode":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/containsNode.js","./focusNode":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/focusNode.js","./getActiveElement":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/getActiveElement.js"}],"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/ReactInstanceHandles.js":[function(require,module,exports){
+},{"./ReactDOMSelection":51,"./containsNode":106,"./focusNode":117,"./getActiveElement":119}],65:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-2014, Facebook, Inc.
@@ -10855,7 +11248,7 @@ var ReactInstanceHandles = {
 module.exports = ReactInstanceHandles;
 
 }).call(this,require('_process'))
-},{"./ReactRootIndex":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/ReactRootIndex.js","./invariant":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/invariant.js","_process":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/watchify/node_modules/browserify/node_modules/process/browser.js"}],"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/ReactLegacyElement.js":[function(require,module,exports){
+},{"./ReactRootIndex":80,"./invariant":132,"_process":5}],66:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2014, Facebook, Inc.
@@ -11102,7 +11495,7 @@ ReactLegacyElementFactory._isLegacyCallWarningEnabled = true;
 module.exports = ReactLegacyElementFactory;
 
 }).call(this,require('_process'))
-},{"./ReactCurrentOwner":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/ReactCurrentOwner.js","./invariant":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/invariant.js","./monitorCodeUse":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/monitorCodeUse.js","./warning":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/warning.js","_process":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/watchify/node_modules/browserify/node_modules/process/browser.js"}],"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/ReactMarkupChecksum.js":[function(require,module,exports){
+},{"./ReactCurrentOwner":41,"./invariant":132,"./monitorCodeUse":142,"./warning":151,"_process":5}],67:[function(require,module,exports){
 /**
  * Copyright 2013-2014, Facebook, Inc.
  * All rights reserved.
@@ -11150,7 +11543,7 @@ var ReactMarkupChecksum = {
 
 module.exports = ReactMarkupChecksum;
 
-},{"./adler32":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/adler32.js"}],"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/ReactMount.js":[function(require,module,exports){
+},{"./adler32":103}],68:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-2014, Facebook, Inc.
@@ -11848,7 +12241,7 @@ ReactMount.renderComponent = deprecated(
 module.exports = ReactMount;
 
 }).call(this,require('_process'))
-},{"./DOMProperty":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/DOMProperty.js","./ReactBrowserEventEmitter":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/ReactBrowserEventEmitter.js","./ReactCurrentOwner":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/ReactCurrentOwner.js","./ReactElement":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/ReactElement.js","./ReactInstanceHandles":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/ReactInstanceHandles.js","./ReactLegacyElement":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/ReactLegacyElement.js","./ReactPerf":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/ReactPerf.js","./containsNode":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/containsNode.js","./deprecated":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/deprecated.js","./getReactRootElementInContainer":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/getReactRootElementInContainer.js","./instantiateReactComponent":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/instantiateReactComponent.js","./invariant":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/invariant.js","./shouldUpdateReactComponent":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/shouldUpdateReactComponent.js","./warning":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/warning.js","_process":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/watchify/node_modules/browserify/node_modules/process/browser.js"}],"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/ReactMultiChild.js":[function(require,module,exports){
+},{"./DOMProperty":15,"./ReactBrowserEventEmitter":35,"./ReactCurrentOwner":41,"./ReactElement":57,"./ReactInstanceHandles":65,"./ReactLegacyElement":66,"./ReactPerf":73,"./containsNode":106,"./deprecated":112,"./getReactRootElementInContainer":126,"./instantiateReactComponent":131,"./invariant":132,"./shouldUpdateReactComponent":148,"./warning":151,"_process":5}],69:[function(require,module,exports){
 /**
  * Copyright 2013-2014, Facebook, Inc.
  * All rights reserved.
@@ -12276,7 +12669,7 @@ var ReactMultiChild = {
 
 module.exports = ReactMultiChild;
 
-},{"./ReactComponent":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/ReactComponent.js","./ReactMultiChildUpdateTypes":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/ReactMultiChildUpdateTypes.js","./flattenChildren":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/flattenChildren.js","./instantiateReactComponent":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/instantiateReactComponent.js","./shouldUpdateReactComponent":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/shouldUpdateReactComponent.js"}],"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/ReactMultiChildUpdateTypes.js":[function(require,module,exports){
+},{"./ReactComponent":37,"./ReactMultiChildUpdateTypes":70,"./flattenChildren":116,"./instantiateReactComponent":131,"./shouldUpdateReactComponent":148}],70:[function(require,module,exports){
 /**
  * Copyright 2013-2014, Facebook, Inc.
  * All rights reserved.
@@ -12309,7 +12702,7 @@ var ReactMultiChildUpdateTypes = keyMirror({
 
 module.exports = ReactMultiChildUpdateTypes;
 
-},{"./keyMirror":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/keyMirror.js"}],"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/ReactNativeComponent.js":[function(require,module,exports){
+},{"./keyMirror":138}],71:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2014, Facebook, Inc.
@@ -12382,7 +12775,7 @@ var ReactNativeComponent = {
 module.exports = ReactNativeComponent;
 
 }).call(this,require('_process'))
-},{"./Object.assign":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/Object.assign.js","./invariant":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/invariant.js","_process":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/watchify/node_modules/browserify/node_modules/process/browser.js"}],"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/ReactOwner.js":[function(require,module,exports){
+},{"./Object.assign":31,"./invariant":132,"_process":5}],72:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-2014, Facebook, Inc.
@@ -12538,7 +12931,7 @@ var ReactOwner = {
 module.exports = ReactOwner;
 
 }).call(this,require('_process'))
-},{"./emptyObject":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/emptyObject.js","./invariant":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/invariant.js","_process":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/watchify/node_modules/browserify/node_modules/process/browser.js"}],"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/ReactPerf.js":[function(require,module,exports){
+},{"./emptyObject":114,"./invariant":132,"_process":5}],73:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-2014, Facebook, Inc.
@@ -12622,7 +13015,7 @@ function _noMeasure(objName, fnName, func) {
 module.exports = ReactPerf;
 
 }).call(this,require('_process'))
-},{"_process":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/watchify/node_modules/browserify/node_modules/process/browser.js"}],"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/ReactPropTransferer.js":[function(require,module,exports){
+},{"_process":5}],74:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-2014, Facebook, Inc.
@@ -12789,7 +13182,7 @@ var ReactPropTransferer = {
 module.exports = ReactPropTransferer;
 
 }).call(this,require('_process'))
-},{"./Object.assign":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/Object.assign.js","./emptyFunction":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/emptyFunction.js","./invariant":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/invariant.js","./joinClasses":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/joinClasses.js","./warning":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/warning.js","_process":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/watchify/node_modules/browserify/node_modules/process/browser.js"}],"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/ReactPropTypeLocationNames.js":[function(require,module,exports){
+},{"./Object.assign":31,"./emptyFunction":113,"./invariant":132,"./joinClasses":137,"./warning":151,"_process":5}],75:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-2014, Facebook, Inc.
@@ -12817,7 +13210,7 @@ if ("production" !== process.env.NODE_ENV) {
 module.exports = ReactPropTypeLocationNames;
 
 }).call(this,require('_process'))
-},{"_process":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/watchify/node_modules/browserify/node_modules/process/browser.js"}],"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/ReactPropTypeLocations.js":[function(require,module,exports){
+},{"_process":5}],76:[function(require,module,exports){
 /**
  * Copyright 2013-2014, Facebook, Inc.
  * All rights reserved.
@@ -12841,7 +13234,7 @@ var ReactPropTypeLocations = keyMirror({
 
 module.exports = ReactPropTypeLocations;
 
-},{"./keyMirror":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/keyMirror.js"}],"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/ReactPropTypes.js":[function(require,module,exports){
+},{"./keyMirror":138}],77:[function(require,module,exports){
 /**
  * Copyright 2013-2014, Facebook, Inc.
  * All rights reserved.
@@ -13195,7 +13588,7 @@ function getPreciseType(propValue) {
 
 module.exports = ReactPropTypes;
 
-},{"./ReactElement":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/ReactElement.js","./ReactPropTypeLocationNames":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/ReactPropTypeLocationNames.js","./deprecated":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/deprecated.js","./emptyFunction":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/emptyFunction.js"}],"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/ReactPutListenerQueue.js":[function(require,module,exports){
+},{"./ReactElement":57,"./ReactPropTypeLocationNames":75,"./deprecated":112,"./emptyFunction":113}],78:[function(require,module,exports){
 /**
  * Copyright 2013-2014, Facebook, Inc.
  * All rights reserved.
@@ -13251,7 +13644,7 @@ PooledClass.addPoolingTo(ReactPutListenerQueue);
 
 module.exports = ReactPutListenerQueue;
 
-},{"./Object.assign":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/Object.assign.js","./PooledClass":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/PooledClass.js","./ReactBrowserEventEmitter":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/ReactBrowserEventEmitter.js"}],"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/ReactReconcileTransaction.js":[function(require,module,exports){
+},{"./Object.assign":31,"./PooledClass":32,"./ReactBrowserEventEmitter":35}],79:[function(require,module,exports){
 /**
  * Copyright 2013-2014, Facebook, Inc.
  * All rights reserved.
@@ -13427,7 +13820,7 @@ PooledClass.addPoolingTo(ReactReconcileTransaction);
 
 module.exports = ReactReconcileTransaction;
 
-},{"./CallbackQueue":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/CallbackQueue.js","./Object.assign":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/Object.assign.js","./PooledClass":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/PooledClass.js","./ReactBrowserEventEmitter":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/ReactBrowserEventEmitter.js","./ReactInputSelection":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/ReactInputSelection.js","./ReactPutListenerQueue":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/ReactPutListenerQueue.js","./Transaction":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/Transaction.js"}],"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/ReactRootIndex.js":[function(require,module,exports){
+},{"./CallbackQueue":10,"./Object.assign":31,"./PooledClass":32,"./ReactBrowserEventEmitter":35,"./ReactInputSelection":64,"./ReactPutListenerQueue":78,"./Transaction":100}],80:[function(require,module,exports){
 /**
  * Copyright 2013-2014, Facebook, Inc.
  * All rights reserved.
@@ -13458,7 +13851,7 @@ var ReactRootIndex = {
 
 module.exports = ReactRootIndex;
 
-},{}],"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/ReactServerRendering.js":[function(require,module,exports){
+},{}],81:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-2014, Facebook, Inc.
@@ -13538,7 +13931,7 @@ module.exports = {
 };
 
 }).call(this,require('_process'))
-},{"./ReactElement":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/ReactElement.js","./ReactInstanceHandles":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/ReactInstanceHandles.js","./ReactMarkupChecksum":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/ReactMarkupChecksum.js","./ReactServerRenderingTransaction":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/ReactServerRenderingTransaction.js","./instantiateReactComponent":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/instantiateReactComponent.js","./invariant":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/invariant.js","_process":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/watchify/node_modules/browserify/node_modules/process/browser.js"}],"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/ReactServerRenderingTransaction.js":[function(require,module,exports){
+},{"./ReactElement":57,"./ReactInstanceHandles":65,"./ReactMarkupChecksum":67,"./ReactServerRenderingTransaction":82,"./instantiateReactComponent":131,"./invariant":132,"_process":5}],82:[function(require,module,exports){
 /**
  * Copyright 2014, Facebook, Inc.
  * All rights reserved.
@@ -13651,7 +14044,7 @@ PooledClass.addPoolingTo(ReactServerRenderingTransaction);
 
 module.exports = ReactServerRenderingTransaction;
 
-},{"./CallbackQueue":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/CallbackQueue.js","./Object.assign":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/Object.assign.js","./PooledClass":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/PooledClass.js","./ReactPutListenerQueue":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/ReactPutListenerQueue.js","./Transaction":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/Transaction.js","./emptyFunction":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/emptyFunction.js"}],"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/ReactTextComponent.js":[function(require,module,exports){
+},{"./CallbackQueue":10,"./Object.assign":31,"./PooledClass":32,"./ReactPutListenerQueue":78,"./Transaction":100,"./emptyFunction":113}],83:[function(require,module,exports){
 /**
  * Copyright 2013-2014, Facebook, Inc.
  * All rights reserved.
@@ -13757,7 +14150,7 @@ ReactTextComponentFactory.type = ReactTextComponent;
 
 module.exports = ReactTextComponentFactory;
 
-},{"./DOMPropertyOperations":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/DOMPropertyOperations.js","./Object.assign":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/Object.assign.js","./ReactComponent":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/ReactComponent.js","./ReactElement":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/ReactElement.js","./escapeTextForBrowser":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/escapeTextForBrowser.js"}],"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/ReactUpdates.js":[function(require,module,exports){
+},{"./DOMPropertyOperations":16,"./Object.assign":31,"./ReactComponent":37,"./ReactElement":57,"./escapeTextForBrowser":115}],84:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-2014, Facebook, Inc.
@@ -14047,7 +14440,7 @@ var ReactUpdates = {
 module.exports = ReactUpdates;
 
 }).call(this,require('_process'))
-},{"./CallbackQueue":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/CallbackQueue.js","./Object.assign":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/Object.assign.js","./PooledClass":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/PooledClass.js","./ReactCurrentOwner":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/ReactCurrentOwner.js","./ReactPerf":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/ReactPerf.js","./Transaction":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/Transaction.js","./invariant":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/invariant.js","./warning":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/warning.js","_process":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/watchify/node_modules/browserify/node_modules/process/browser.js"}],"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/SVGDOMPropertyConfig.js":[function(require,module,exports){
+},{"./CallbackQueue":10,"./Object.assign":31,"./PooledClass":32,"./ReactCurrentOwner":41,"./ReactPerf":73,"./Transaction":100,"./invariant":132,"./warning":151,"_process":5}],85:[function(require,module,exports){
 /**
  * Copyright 2013-2014, Facebook, Inc.
  * All rights reserved.
@@ -14139,7 +14532,7 @@ var SVGDOMPropertyConfig = {
 
 module.exports = SVGDOMPropertyConfig;
 
-},{"./DOMProperty":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/DOMProperty.js"}],"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/SelectEventPlugin.js":[function(require,module,exports){
+},{"./DOMProperty":15}],86:[function(require,module,exports){
 /**
  * Copyright 2013-2014, Facebook, Inc.
  * All rights reserved.
@@ -14334,7 +14727,7 @@ var SelectEventPlugin = {
 
 module.exports = SelectEventPlugin;
 
-},{"./EventConstants":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/EventConstants.js","./EventPropagators":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/EventPropagators.js","./ReactInputSelection":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/ReactInputSelection.js","./SyntheticEvent":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/SyntheticEvent.js","./getActiveElement":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/getActiveElement.js","./isTextInputElement":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/isTextInputElement.js","./keyOf":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/keyOf.js","./shallowEqual":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/shallowEqual.js"}],"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/ServerReactRootIndex.js":[function(require,module,exports){
+},{"./EventConstants":20,"./EventPropagators":25,"./ReactInputSelection":64,"./SyntheticEvent":92,"./getActiveElement":119,"./isTextInputElement":135,"./keyOf":139,"./shallowEqual":147}],87:[function(require,module,exports){
 /**
  * Copyright 2013-2014, Facebook, Inc.
  * All rights reserved.
@@ -14365,7 +14758,7 @@ var ServerReactRootIndex = {
 
 module.exports = ServerReactRootIndex;
 
-},{}],"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/SimpleEventPlugin.js":[function(require,module,exports){
+},{}],88:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-2014, Facebook, Inc.
@@ -14793,7 +15186,7 @@ var SimpleEventPlugin = {
 module.exports = SimpleEventPlugin;
 
 }).call(this,require('_process'))
-},{"./EventConstants":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/EventConstants.js","./EventPluginUtils":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/EventPluginUtils.js","./EventPropagators":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/EventPropagators.js","./SyntheticClipboardEvent":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/SyntheticClipboardEvent.js","./SyntheticDragEvent":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/SyntheticDragEvent.js","./SyntheticEvent":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/SyntheticEvent.js","./SyntheticFocusEvent":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/SyntheticFocusEvent.js","./SyntheticKeyboardEvent":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/SyntheticKeyboardEvent.js","./SyntheticMouseEvent":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/SyntheticMouseEvent.js","./SyntheticTouchEvent":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/SyntheticTouchEvent.js","./SyntheticUIEvent":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/SyntheticUIEvent.js","./SyntheticWheelEvent":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/SyntheticWheelEvent.js","./getEventCharCode":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/getEventCharCode.js","./invariant":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/invariant.js","./keyOf":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/keyOf.js","./warning":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/warning.js","_process":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/watchify/node_modules/browserify/node_modules/process/browser.js"}],"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/SyntheticClipboardEvent.js":[function(require,module,exports){
+},{"./EventConstants":20,"./EventPluginUtils":24,"./EventPropagators":25,"./SyntheticClipboardEvent":89,"./SyntheticDragEvent":91,"./SyntheticEvent":92,"./SyntheticFocusEvent":93,"./SyntheticKeyboardEvent":95,"./SyntheticMouseEvent":96,"./SyntheticTouchEvent":97,"./SyntheticUIEvent":98,"./SyntheticWheelEvent":99,"./getEventCharCode":120,"./invariant":132,"./keyOf":139,"./warning":151,"_process":5}],89:[function(require,module,exports){
 /**
  * Copyright 2013-2014, Facebook, Inc.
  * All rights reserved.
@@ -14839,7 +15232,7 @@ SyntheticEvent.augmentClass(SyntheticClipboardEvent, ClipboardEventInterface);
 module.exports = SyntheticClipboardEvent;
 
 
-},{"./SyntheticEvent":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/SyntheticEvent.js"}],"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/SyntheticCompositionEvent.js":[function(require,module,exports){
+},{"./SyntheticEvent":92}],90:[function(require,module,exports){
 /**
  * Copyright 2013-2014, Facebook, Inc.
  * All rights reserved.
@@ -14885,7 +15278,7 @@ SyntheticEvent.augmentClass(
 module.exports = SyntheticCompositionEvent;
 
 
-},{"./SyntheticEvent":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/SyntheticEvent.js"}],"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/SyntheticDragEvent.js":[function(require,module,exports){
+},{"./SyntheticEvent":92}],91:[function(require,module,exports){
 /**
  * Copyright 2013-2014, Facebook, Inc.
  * All rights reserved.
@@ -14924,7 +15317,7 @@ SyntheticMouseEvent.augmentClass(SyntheticDragEvent, DragEventInterface);
 
 module.exports = SyntheticDragEvent;
 
-},{"./SyntheticMouseEvent":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/SyntheticMouseEvent.js"}],"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/SyntheticEvent.js":[function(require,module,exports){
+},{"./SyntheticMouseEvent":96}],92:[function(require,module,exports){
 /**
  * Copyright 2013-2014, Facebook, Inc.
  * All rights reserved.
@@ -15082,7 +15475,7 @@ PooledClass.addPoolingTo(SyntheticEvent, PooledClass.threeArgumentPooler);
 
 module.exports = SyntheticEvent;
 
-},{"./Object.assign":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/Object.assign.js","./PooledClass":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/PooledClass.js","./emptyFunction":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/emptyFunction.js","./getEventTarget":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/getEventTarget.js"}],"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/SyntheticFocusEvent.js":[function(require,module,exports){
+},{"./Object.assign":31,"./PooledClass":32,"./emptyFunction":113,"./getEventTarget":123}],93:[function(require,module,exports){
 /**
  * Copyright 2013-2014, Facebook, Inc.
  * All rights reserved.
@@ -15121,7 +15514,7 @@ SyntheticUIEvent.augmentClass(SyntheticFocusEvent, FocusEventInterface);
 
 module.exports = SyntheticFocusEvent;
 
-},{"./SyntheticUIEvent":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/SyntheticUIEvent.js"}],"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/SyntheticInputEvent.js":[function(require,module,exports){
+},{"./SyntheticUIEvent":98}],94:[function(require,module,exports){
 /**
  * Copyright 2013 Facebook, Inc.
  * All rights reserved.
@@ -15168,7 +15561,7 @@ SyntheticEvent.augmentClass(
 module.exports = SyntheticInputEvent;
 
 
-},{"./SyntheticEvent":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/SyntheticEvent.js"}],"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/SyntheticKeyboardEvent.js":[function(require,module,exports){
+},{"./SyntheticEvent":92}],95:[function(require,module,exports){
 /**
  * Copyright 2013-2014, Facebook, Inc.
  * All rights reserved.
@@ -15255,7 +15648,7 @@ SyntheticUIEvent.augmentClass(SyntheticKeyboardEvent, KeyboardEventInterface);
 
 module.exports = SyntheticKeyboardEvent;
 
-},{"./SyntheticUIEvent":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/SyntheticUIEvent.js","./getEventCharCode":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/getEventCharCode.js","./getEventKey":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/getEventKey.js","./getEventModifierState":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/getEventModifierState.js"}],"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/SyntheticMouseEvent.js":[function(require,module,exports){
+},{"./SyntheticUIEvent":98,"./getEventCharCode":120,"./getEventKey":121,"./getEventModifierState":122}],96:[function(require,module,exports){
 /**
  * Copyright 2013-2014, Facebook, Inc.
  * All rights reserved.
@@ -15338,7 +15731,7 @@ SyntheticUIEvent.augmentClass(SyntheticMouseEvent, MouseEventInterface);
 
 module.exports = SyntheticMouseEvent;
 
-},{"./SyntheticUIEvent":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/SyntheticUIEvent.js","./ViewportMetrics":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/ViewportMetrics.js","./getEventModifierState":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/getEventModifierState.js"}],"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/SyntheticTouchEvent.js":[function(require,module,exports){
+},{"./SyntheticUIEvent":98,"./ViewportMetrics":101,"./getEventModifierState":122}],97:[function(require,module,exports){
 /**
  * Copyright 2013-2014, Facebook, Inc.
  * All rights reserved.
@@ -15386,7 +15779,7 @@ SyntheticUIEvent.augmentClass(SyntheticTouchEvent, TouchEventInterface);
 
 module.exports = SyntheticTouchEvent;
 
-},{"./SyntheticUIEvent":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/SyntheticUIEvent.js","./getEventModifierState":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/getEventModifierState.js"}],"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/SyntheticUIEvent.js":[function(require,module,exports){
+},{"./SyntheticUIEvent":98,"./getEventModifierState":122}],98:[function(require,module,exports){
 /**
  * Copyright 2013-2014, Facebook, Inc.
  * All rights reserved.
@@ -15448,7 +15841,7 @@ SyntheticEvent.augmentClass(SyntheticUIEvent, UIEventInterface);
 
 module.exports = SyntheticUIEvent;
 
-},{"./SyntheticEvent":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/SyntheticEvent.js","./getEventTarget":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/getEventTarget.js"}],"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/SyntheticWheelEvent.js":[function(require,module,exports){
+},{"./SyntheticEvent":92,"./getEventTarget":123}],99:[function(require,module,exports){
 /**
  * Copyright 2013-2014, Facebook, Inc.
  * All rights reserved.
@@ -15509,7 +15902,7 @@ SyntheticMouseEvent.augmentClass(SyntheticWheelEvent, WheelEventInterface);
 
 module.exports = SyntheticWheelEvent;
 
-},{"./SyntheticMouseEvent":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/SyntheticMouseEvent.js"}],"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/Transaction.js":[function(require,module,exports){
+},{"./SyntheticMouseEvent":96}],100:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-2014, Facebook, Inc.
@@ -15750,7 +16143,7 @@ var Transaction = {
 module.exports = Transaction;
 
 }).call(this,require('_process'))
-},{"./invariant":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/invariant.js","_process":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/watchify/node_modules/browserify/node_modules/process/browser.js"}],"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/ViewportMetrics.js":[function(require,module,exports){
+},{"./invariant":132,"_process":5}],101:[function(require,module,exports){
 /**
  * Copyright 2013-2014, Facebook, Inc.
  * All rights reserved.
@@ -15782,7 +16175,7 @@ var ViewportMetrics = {
 
 module.exports = ViewportMetrics;
 
-},{"./getUnboundedScrollPosition":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/getUnboundedScrollPosition.js"}],"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/accumulateInto.js":[function(require,module,exports){
+},{"./getUnboundedScrollPosition":128}],102:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2014, Facebook, Inc.
@@ -15848,7 +16241,7 @@ function accumulateInto(current, next) {
 module.exports = accumulateInto;
 
 }).call(this,require('_process'))
-},{"./invariant":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/invariant.js","_process":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/watchify/node_modules/browserify/node_modules/process/browser.js"}],"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/adler32.js":[function(require,module,exports){
+},{"./invariant":132,"_process":5}],103:[function(require,module,exports){
 /**
  * Copyright 2013-2014, Facebook, Inc.
  * All rights reserved.
@@ -15882,7 +16275,7 @@ function adler32(data) {
 
 module.exports = adler32;
 
-},{}],"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/camelize.js":[function(require,module,exports){
+},{}],104:[function(require,module,exports){
 /**
  * Copyright 2013-2014, Facebook, Inc.
  * All rights reserved.
@@ -15914,7 +16307,7 @@ function camelize(string) {
 
 module.exports = camelize;
 
-},{}],"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/camelizeStyleName.js":[function(require,module,exports){
+},{}],105:[function(require,module,exports){
 /**
  * Copyright 2014, Facebook, Inc.
  * All rights reserved.
@@ -15956,7 +16349,7 @@ function camelizeStyleName(string) {
 
 module.exports = camelizeStyleName;
 
-},{"./camelize":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/camelize.js"}],"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/containsNode.js":[function(require,module,exports){
+},{"./camelize":104}],106:[function(require,module,exports){
 /**
  * Copyright 2013-2014, Facebook, Inc.
  * All rights reserved.
@@ -16000,7 +16393,7 @@ function containsNode(outerNode, innerNode) {
 
 module.exports = containsNode;
 
-},{"./isTextNode":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/isTextNode.js"}],"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/createArrayFrom.js":[function(require,module,exports){
+},{"./isTextNode":136}],107:[function(require,module,exports){
 /**
  * Copyright 2013-2014, Facebook, Inc.
  * All rights reserved.
@@ -16086,7 +16479,7 @@ function createArrayFrom(obj) {
 
 module.exports = createArrayFrom;
 
-},{"./toArray":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/toArray.js"}],"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/createFullPageComponent.js":[function(require,module,exports){
+},{"./toArray":149}],108:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-2014, Facebook, Inc.
@@ -16147,7 +16540,7 @@ function createFullPageComponent(tag) {
 module.exports = createFullPageComponent;
 
 }).call(this,require('_process'))
-},{"./ReactCompositeComponent":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/ReactCompositeComponent.js","./ReactElement":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/ReactElement.js","./invariant":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/invariant.js","_process":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/watchify/node_modules/browserify/node_modules/process/browser.js"}],"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/createNodesFromMarkup.js":[function(require,module,exports){
+},{"./ReactCompositeComponent":39,"./ReactElement":57,"./invariant":132,"_process":5}],109:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-2014, Facebook, Inc.
@@ -16237,7 +16630,7 @@ function createNodesFromMarkup(markup, handleScript) {
 module.exports = createNodesFromMarkup;
 
 }).call(this,require('_process'))
-},{"./ExecutionEnvironment":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/ExecutionEnvironment.js","./createArrayFrom":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/createArrayFrom.js","./getMarkupWrap":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/getMarkupWrap.js","./invariant":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/invariant.js","_process":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/watchify/node_modules/browserify/node_modules/process/browser.js"}],"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/cx.js":[function(require,module,exports){
+},{"./ExecutionEnvironment":26,"./createArrayFrom":107,"./getMarkupWrap":124,"./invariant":132,"_process":5}],110:[function(require,module,exports){
 /**
  * Copyright 2013-2014, Facebook, Inc.
  * All rights reserved.
@@ -16276,7 +16669,7 @@ function cx(classNames) {
 
 module.exports = cx;
 
-},{}],"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/dangerousStyleValue.js":[function(require,module,exports){
+},{}],111:[function(require,module,exports){
 /**
  * Copyright 2013-2014, Facebook, Inc.
  * All rights reserved.
@@ -16334,7 +16727,7 @@ function dangerousStyleValue(name, value) {
 
 module.exports = dangerousStyleValue;
 
-},{"./CSSProperty":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/CSSProperty.js"}],"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/deprecated.js":[function(require,module,exports){
+},{"./CSSProperty":8}],112:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-2014, Facebook, Inc.
@@ -16385,7 +16778,7 @@ function deprecated(namespace, oldName, newName, ctx, fn) {
 module.exports = deprecated;
 
 }).call(this,require('_process'))
-},{"./Object.assign":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/Object.assign.js","./warning":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/warning.js","_process":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/watchify/node_modules/browserify/node_modules/process/browser.js"}],"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/emptyFunction.js":[function(require,module,exports){
+},{"./Object.assign":31,"./warning":151,"_process":5}],113:[function(require,module,exports){
 /**
  * Copyright 2013-2014, Facebook, Inc.
  * All rights reserved.
@@ -16419,7 +16812,7 @@ emptyFunction.thatReturnsArgument = function(arg) { return arg; };
 
 module.exports = emptyFunction;
 
-},{}],"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/emptyObject.js":[function(require,module,exports){
+},{}],114:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-2014, Facebook, Inc.
@@ -16443,7 +16836,7 @@ if ("production" !== process.env.NODE_ENV) {
 module.exports = emptyObject;
 
 }).call(this,require('_process'))
-},{"_process":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/watchify/node_modules/browserify/node_modules/process/browser.js"}],"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/escapeTextForBrowser.js":[function(require,module,exports){
+},{"_process":5}],115:[function(require,module,exports){
 /**
  * Copyright 2013-2014, Facebook, Inc.
  * All rights reserved.
@@ -16484,7 +16877,7 @@ function escapeTextForBrowser(text) {
 
 module.exports = escapeTextForBrowser;
 
-},{}],"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/flattenChildren.js":[function(require,module,exports){
+},{}],116:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-2014, Facebook, Inc.
@@ -16553,7 +16946,7 @@ function flattenChildren(children) {
 module.exports = flattenChildren;
 
 }).call(this,require('_process'))
-},{"./ReactTextComponent":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/ReactTextComponent.js","./traverseAllChildren":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/traverseAllChildren.js","./warning":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/warning.js","_process":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/watchify/node_modules/browserify/node_modules/process/browser.js"}],"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/focusNode.js":[function(require,module,exports){
+},{"./ReactTextComponent":83,"./traverseAllChildren":150,"./warning":151,"_process":5}],117:[function(require,module,exports){
 /**
  * Copyright 2014, Facebook, Inc.
  * All rights reserved.
@@ -16582,7 +16975,7 @@ function focusNode(node) {
 
 module.exports = focusNode;
 
-},{}],"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/forEachAccumulated.js":[function(require,module,exports){
+},{}],118:[function(require,module,exports){
 /**
  * Copyright 2013-2014, Facebook, Inc.
  * All rights reserved.
@@ -16613,7 +17006,7 @@ var forEachAccumulated = function(arr, cb, scope) {
 
 module.exports = forEachAccumulated;
 
-},{}],"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/getActiveElement.js":[function(require,module,exports){
+},{}],119:[function(require,module,exports){
 /**
  * Copyright 2013-2014, Facebook, Inc.
  * All rights reserved.
@@ -16642,7 +17035,7 @@ function getActiveElement() /*?DOMElement*/ {
 
 module.exports = getActiveElement;
 
-},{}],"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/getEventCharCode.js":[function(require,module,exports){
+},{}],120:[function(require,module,exports){
 /**
  * Copyright 2013-2014, Facebook, Inc.
  * All rights reserved.
@@ -16694,7 +17087,7 @@ function getEventCharCode(nativeEvent) {
 
 module.exports = getEventCharCode;
 
-},{}],"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/getEventKey.js":[function(require,module,exports){
+},{}],121:[function(require,module,exports){
 /**
  * Copyright 2013-2014, Facebook, Inc.
  * All rights reserved.
@@ -16799,7 +17192,7 @@ function getEventKey(nativeEvent) {
 
 module.exports = getEventKey;
 
-},{"./getEventCharCode":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/getEventCharCode.js"}],"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/getEventModifierState.js":[function(require,module,exports){
+},{"./getEventCharCode":120}],122:[function(require,module,exports){
 /**
  * Copyright 2013 Facebook, Inc.
  * All rights reserved.
@@ -16846,7 +17239,7 @@ function getEventModifierState(nativeEvent) {
 
 module.exports = getEventModifierState;
 
-},{}],"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/getEventTarget.js":[function(require,module,exports){
+},{}],123:[function(require,module,exports){
 /**
  * Copyright 2013-2014, Facebook, Inc.
  * All rights reserved.
@@ -16877,7 +17270,7 @@ function getEventTarget(nativeEvent) {
 
 module.exports = getEventTarget;
 
-},{}],"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/getMarkupWrap.js":[function(require,module,exports){
+},{}],124:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-2014, Facebook, Inc.
@@ -16994,7 +17387,7 @@ function getMarkupWrap(nodeName) {
 module.exports = getMarkupWrap;
 
 }).call(this,require('_process'))
-},{"./ExecutionEnvironment":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/ExecutionEnvironment.js","./invariant":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/invariant.js","_process":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/watchify/node_modules/browserify/node_modules/process/browser.js"}],"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/getNodeForCharacterOffset.js":[function(require,module,exports){
+},{"./ExecutionEnvironment":26,"./invariant":132,"_process":5}],125:[function(require,module,exports){
 /**
  * Copyright 2013-2014, Facebook, Inc.
  * All rights reserved.
@@ -17069,7 +17462,7 @@ function getNodeForCharacterOffset(root, offset) {
 
 module.exports = getNodeForCharacterOffset;
 
-},{}],"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/getReactRootElementInContainer.js":[function(require,module,exports){
+},{}],126:[function(require,module,exports){
 /**
  * Copyright 2013-2014, Facebook, Inc.
  * All rights reserved.
@@ -17104,7 +17497,7 @@ function getReactRootElementInContainer(container) {
 
 module.exports = getReactRootElementInContainer;
 
-},{}],"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/getTextContentAccessor.js":[function(require,module,exports){
+},{}],127:[function(require,module,exports){
 /**
  * Copyright 2013-2014, Facebook, Inc.
  * All rights reserved.
@@ -17141,7 +17534,7 @@ function getTextContentAccessor() {
 
 module.exports = getTextContentAccessor;
 
-},{"./ExecutionEnvironment":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/ExecutionEnvironment.js"}],"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/getUnboundedScrollPosition.js":[function(require,module,exports){
+},{"./ExecutionEnvironment":26}],128:[function(require,module,exports){
 /**
  * Copyright 2013-2014, Facebook, Inc.
  * All rights reserved.
@@ -17181,7 +17574,7 @@ function getUnboundedScrollPosition(scrollable) {
 
 module.exports = getUnboundedScrollPosition;
 
-},{}],"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/hyphenate.js":[function(require,module,exports){
+},{}],129:[function(require,module,exports){
 /**
  * Copyright 2013-2014, Facebook, Inc.
  * All rights reserved.
@@ -17214,7 +17607,7 @@ function hyphenate(string) {
 
 module.exports = hyphenate;
 
-},{}],"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/hyphenateStyleName.js":[function(require,module,exports){
+},{}],130:[function(require,module,exports){
 /**
  * Copyright 2013-2014, Facebook, Inc.
  * All rights reserved.
@@ -17255,7 +17648,7 @@ function hyphenateStyleName(string) {
 
 module.exports = hyphenateStyleName;
 
-},{"./hyphenate":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/hyphenate.js"}],"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/instantiateReactComponent.js":[function(require,module,exports){
+},{"./hyphenate":129}],131:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-2014, Facebook, Inc.
@@ -17369,7 +17762,7 @@ function instantiateReactComponent(element, parentCompositeType) {
 module.exports = instantiateReactComponent;
 
 }).call(this,require('_process'))
-},{"./ReactElement":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/ReactElement.js","./ReactEmptyComponent":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/ReactEmptyComponent.js","./ReactLegacyElement":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/ReactLegacyElement.js","./ReactNativeComponent":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/ReactNativeComponent.js","./warning":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/warning.js","_process":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/watchify/node_modules/browserify/node_modules/process/browser.js"}],"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/invariant.js":[function(require,module,exports){
+},{"./ReactElement":57,"./ReactEmptyComponent":59,"./ReactLegacyElement":66,"./ReactNativeComponent":71,"./warning":151,"_process":5}],132:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-2014, Facebook, Inc.
@@ -17426,7 +17819,7 @@ var invariant = function(condition, format, a, b, c, d, e, f) {
 module.exports = invariant;
 
 }).call(this,require('_process'))
-},{"_process":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/watchify/node_modules/browserify/node_modules/process/browser.js"}],"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/isEventSupported.js":[function(require,module,exports){
+},{"_process":5}],133:[function(require,module,exports){
 /**
  * Copyright 2013-2014, Facebook, Inc.
  * All rights reserved.
@@ -17491,7 +17884,7 @@ function isEventSupported(eventNameSuffix, capture) {
 
 module.exports = isEventSupported;
 
-},{"./ExecutionEnvironment":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/ExecutionEnvironment.js"}],"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/isNode.js":[function(require,module,exports){
+},{"./ExecutionEnvironment":26}],134:[function(require,module,exports){
 /**
  * Copyright 2013-2014, Facebook, Inc.
  * All rights reserved.
@@ -17519,7 +17912,7 @@ function isNode(object) {
 
 module.exports = isNode;
 
-},{}],"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/isTextInputElement.js":[function(require,module,exports){
+},{}],135:[function(require,module,exports){
 /**
  * Copyright 2013-2014, Facebook, Inc.
  * All rights reserved.
@@ -17563,7 +17956,7 @@ function isTextInputElement(elem) {
 
 module.exports = isTextInputElement;
 
-},{}],"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/isTextNode.js":[function(require,module,exports){
+},{}],136:[function(require,module,exports){
 /**
  * Copyright 2013-2014, Facebook, Inc.
  * All rights reserved.
@@ -17588,7 +17981,7 @@ function isTextNode(object) {
 
 module.exports = isTextNode;
 
-},{"./isNode":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/isNode.js"}],"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/joinClasses.js":[function(require,module,exports){
+},{"./isNode":134}],137:[function(require,module,exports){
 /**
  * Copyright 2013-2014, Facebook, Inc.
  * All rights reserved.
@@ -17629,7 +18022,7 @@ function joinClasses(className/*, ... */) {
 
 module.exports = joinClasses;
 
-},{}],"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/keyMirror.js":[function(require,module,exports){
+},{}],138:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-2014, Facebook, Inc.
@@ -17684,7 +18077,7 @@ var keyMirror = function(obj) {
 module.exports = keyMirror;
 
 }).call(this,require('_process'))
-},{"./invariant":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/invariant.js","_process":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/watchify/node_modules/browserify/node_modules/process/browser.js"}],"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/keyOf.js":[function(require,module,exports){
+},{"./invariant":132,"_process":5}],139:[function(require,module,exports){
 /**
  * Copyright 2013-2014, Facebook, Inc.
  * All rights reserved.
@@ -17720,7 +18113,7 @@ var keyOf = function(oneKeyObj) {
 
 module.exports = keyOf;
 
-},{}],"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/mapObject.js":[function(require,module,exports){
+},{}],140:[function(require,module,exports){
 /**
  * Copyright 2013-2014, Facebook, Inc.
  * All rights reserved.
@@ -17773,7 +18166,7 @@ function mapObject(object, callback, context) {
 
 module.exports = mapObject;
 
-},{}],"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/memoizeStringOnly.js":[function(require,module,exports){
+},{}],141:[function(require,module,exports){
 /**
  * Copyright 2013-2014, Facebook, Inc.
  * All rights reserved.
@@ -17807,7 +18200,7 @@ function memoizeStringOnly(callback) {
 
 module.exports = memoizeStringOnly;
 
-},{}],"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/monitorCodeUse.js":[function(require,module,exports){
+},{}],142:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2014, Facebook, Inc.
@@ -17841,7 +18234,7 @@ function monitorCodeUse(eventName, data) {
 module.exports = monitorCodeUse;
 
 }).call(this,require('_process'))
-},{"./invariant":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/invariant.js","_process":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/watchify/node_modules/browserify/node_modules/process/browser.js"}],"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/onlyChild.js":[function(require,module,exports){
+},{"./invariant":132,"_process":5}],143:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-2014, Facebook, Inc.
@@ -17881,7 +18274,7 @@ function onlyChild(children) {
 module.exports = onlyChild;
 
 }).call(this,require('_process'))
-},{"./ReactElement":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/ReactElement.js","./invariant":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/invariant.js","_process":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/watchify/node_modules/browserify/node_modules/process/browser.js"}],"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/performance.js":[function(require,module,exports){
+},{"./ReactElement":57,"./invariant":132,"_process":5}],144:[function(require,module,exports){
 /**
  * Copyright 2013-2014, Facebook, Inc.
  * All rights reserved.
@@ -17909,7 +18302,7 @@ if (ExecutionEnvironment.canUseDOM) {
 
 module.exports = performance || {};
 
-},{"./ExecutionEnvironment":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/ExecutionEnvironment.js"}],"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/performanceNow.js":[function(require,module,exports){
+},{"./ExecutionEnvironment":26}],145:[function(require,module,exports){
 /**
  * Copyright 2013-2014, Facebook, Inc.
  * All rights reserved.
@@ -17937,7 +18330,7 @@ var performanceNow = performance.now.bind(performance);
 
 module.exports = performanceNow;
 
-},{"./performance":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/performance.js"}],"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/setInnerHTML.js":[function(require,module,exports){
+},{"./performance":144}],146:[function(require,module,exports){
 /**
  * Copyright 2013-2014, Facebook, Inc.
  * All rights reserved.
@@ -18015,7 +18408,7 @@ if (ExecutionEnvironment.canUseDOM) {
 
 module.exports = setInnerHTML;
 
-},{"./ExecutionEnvironment":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/ExecutionEnvironment.js"}],"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/shallowEqual.js":[function(require,module,exports){
+},{"./ExecutionEnvironment":26}],147:[function(require,module,exports){
 /**
  * Copyright 2013-2014, Facebook, Inc.
  * All rights reserved.
@@ -18059,7 +18452,7 @@ function shallowEqual(objA, objB) {
 
 module.exports = shallowEqual;
 
-},{}],"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/shouldUpdateReactComponent.js":[function(require,module,exports){
+},{}],148:[function(require,module,exports){
 /**
  * Copyright 2013-2014, Facebook, Inc.
  * All rights reserved.
@@ -18097,7 +18490,7 @@ function shouldUpdateReactComponent(prevElement, nextElement) {
 
 module.exports = shouldUpdateReactComponent;
 
-},{}],"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/toArray.js":[function(require,module,exports){
+},{}],149:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2014, Facebook, Inc.
@@ -18169,7 +18562,7 @@ function toArray(obj) {
 module.exports = toArray;
 
 }).call(this,require('_process'))
-},{"./invariant":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/invariant.js","_process":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/watchify/node_modules/browserify/node_modules/process/browser.js"}],"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/traverseAllChildren.js":[function(require,module,exports){
+},{"./invariant":132,"_process":5}],150:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-2014, Facebook, Inc.
@@ -18352,7 +18745,7 @@ function traverseAllChildren(children, callback, traverseContext) {
 module.exports = traverseAllChildren;
 
 }).call(this,require('_process'))
-},{"./ReactElement":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/ReactElement.js","./ReactInstanceHandles":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/ReactInstanceHandles.js","./invariant":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/invariant.js","_process":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/watchify/node_modules/browserify/node_modules/process/browser.js"}],"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/warning.js":[function(require,module,exports){
+},{"./ReactElement":57,"./ReactInstanceHandles":65,"./invariant":132,"_process":5}],151:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2014, Facebook, Inc.
@@ -18397,401 +18790,10 @@ if ("production" !== process.env.NODE_ENV) {
 module.exports = warning;
 
 }).call(this,require('_process'))
-},{"./emptyFunction":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/emptyFunction.js","_process":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/watchify/node_modules/browserify/node_modules/process/browser.js"}],"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/react.js":[function(require,module,exports){
+},{"./emptyFunction":113,"_process":5}],152:[function(require,module,exports){
 module.exports = require('./lib/React');
 
-},{"./lib/React":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/React.js"}],"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/watchify/node_modules/browserify/node_modules/events/events.js":[function(require,module,exports){
-// Copyright Joyent, Inc. and other Node contributors.
-//
-// Permission is hereby granted, free of charge, to any person obtaining a
-// copy of this software and associated documentation files (the
-// "Software"), to deal in the Software without restriction, including
-// without limitation the rights to use, copy, modify, merge, publish,
-// distribute, sublicense, and/or sell copies of the Software, and to permit
-// persons to whom the Software is furnished to do so, subject to the
-// following conditions:
-//
-// The above copyright notice and this permission notice shall be included
-// in all copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
-// OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
-// MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN
-// NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
-// DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
-// OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
-// USE OR OTHER DEALINGS IN THE SOFTWARE.
-
-function EventEmitter() {
-  this._events = this._events || {};
-  this._maxListeners = this._maxListeners || undefined;
-}
-module.exports = EventEmitter;
-
-// Backwards-compat with node 0.10.x
-EventEmitter.EventEmitter = EventEmitter;
-
-EventEmitter.prototype._events = undefined;
-EventEmitter.prototype._maxListeners = undefined;
-
-// By default EventEmitters will print a warning if more than 10 listeners are
-// added to it. This is a useful default which helps finding memory leaks.
-EventEmitter.defaultMaxListeners = 10;
-
-// Obviously not all Emitters should be limited to 10. This function allows
-// that to be increased. Set to zero for unlimited.
-EventEmitter.prototype.setMaxListeners = function(n) {
-  if (!isNumber(n) || n < 0 || isNaN(n))
-    throw TypeError('n must be a positive number');
-  this._maxListeners = n;
-  return this;
-};
-
-EventEmitter.prototype.emit = function(type) {
-  var er, handler, len, args, i, listeners;
-
-  if (!this._events)
-    this._events = {};
-
-  // If there is no 'error' event listener then throw.
-  if (type === 'error') {
-    if (!this._events.error ||
-        (isObject(this._events.error) && !this._events.error.length)) {
-      er = arguments[1];
-      if (er instanceof Error) {
-        throw er; // Unhandled 'error' event
-      }
-      throw TypeError('Uncaught, unspecified "error" event.');
-    }
-  }
-
-  handler = this._events[type];
-
-  if (isUndefined(handler))
-    return false;
-
-  if (isFunction(handler)) {
-    switch (arguments.length) {
-      // fast cases
-      case 1:
-        handler.call(this);
-        break;
-      case 2:
-        handler.call(this, arguments[1]);
-        break;
-      case 3:
-        handler.call(this, arguments[1], arguments[2]);
-        break;
-      // slower
-      default:
-        len = arguments.length;
-        args = new Array(len - 1);
-        for (i = 1; i < len; i++)
-          args[i - 1] = arguments[i];
-        handler.apply(this, args);
-    }
-  } else if (isObject(handler)) {
-    len = arguments.length;
-    args = new Array(len - 1);
-    for (i = 1; i < len; i++)
-      args[i - 1] = arguments[i];
-
-    listeners = handler.slice();
-    len = listeners.length;
-    for (i = 0; i < len; i++)
-      listeners[i].apply(this, args);
-  }
-
-  return true;
-};
-
-EventEmitter.prototype.addListener = function(type, listener) {
-  var m;
-
-  if (!isFunction(listener))
-    throw TypeError('listener must be a function');
-
-  if (!this._events)
-    this._events = {};
-
-  // To avoid recursion in the case that type === "newListener"! Before
-  // adding it to the listeners, first emit "newListener".
-  if (this._events.newListener)
-    this.emit('newListener', type,
-              isFunction(listener.listener) ?
-              listener.listener : listener);
-
-  if (!this._events[type])
-    // Optimize the case of one listener. Don't need the extra array object.
-    this._events[type] = listener;
-  else if (isObject(this._events[type]))
-    // If we've already got an array, just append.
-    this._events[type].push(listener);
-  else
-    // Adding the second element, need to change to array.
-    this._events[type] = [this._events[type], listener];
-
-  // Check for listener leak
-  if (isObject(this._events[type]) && !this._events[type].warned) {
-    var m;
-    if (!isUndefined(this._maxListeners)) {
-      m = this._maxListeners;
-    } else {
-      m = EventEmitter.defaultMaxListeners;
-    }
-
-    if (m && m > 0 && this._events[type].length > m) {
-      this._events[type].warned = true;
-      console.error('(node) warning: possible EventEmitter memory ' +
-                    'leak detected. %d listeners added. ' +
-                    'Use emitter.setMaxListeners() to increase limit.',
-                    this._events[type].length);
-      if (typeof console.trace === 'function') {
-        // not supported in IE 10
-        console.trace();
-      }
-    }
-  }
-
-  return this;
-};
-
-EventEmitter.prototype.on = EventEmitter.prototype.addListener;
-
-EventEmitter.prototype.once = function(type, listener) {
-  if (!isFunction(listener))
-    throw TypeError('listener must be a function');
-
-  var fired = false;
-
-  function g() {
-    this.removeListener(type, g);
-
-    if (!fired) {
-      fired = true;
-      listener.apply(this, arguments);
-    }
-  }
-
-  g.listener = listener;
-  this.on(type, g);
-
-  return this;
-};
-
-// emits a 'removeListener' event iff the listener was removed
-EventEmitter.prototype.removeListener = function(type, listener) {
-  var list, position, length, i;
-
-  if (!isFunction(listener))
-    throw TypeError('listener must be a function');
-
-  if (!this._events || !this._events[type])
-    return this;
-
-  list = this._events[type];
-  length = list.length;
-  position = -1;
-
-  if (list === listener ||
-      (isFunction(list.listener) && list.listener === listener)) {
-    delete this._events[type];
-    if (this._events.removeListener)
-      this.emit('removeListener', type, listener);
-
-  } else if (isObject(list)) {
-    for (i = length; i-- > 0;) {
-      if (list[i] === listener ||
-          (list[i].listener && list[i].listener === listener)) {
-        position = i;
-        break;
-      }
-    }
-
-    if (position < 0)
-      return this;
-
-    if (list.length === 1) {
-      list.length = 0;
-      delete this._events[type];
-    } else {
-      list.splice(position, 1);
-    }
-
-    if (this._events.removeListener)
-      this.emit('removeListener', type, listener);
-  }
-
-  return this;
-};
-
-EventEmitter.prototype.removeAllListeners = function(type) {
-  var key, listeners;
-
-  if (!this._events)
-    return this;
-
-  // not listening for removeListener, no need to emit
-  if (!this._events.removeListener) {
-    if (arguments.length === 0)
-      this._events = {};
-    else if (this._events[type])
-      delete this._events[type];
-    return this;
-  }
-
-  // emit removeListener for all listeners on all events
-  if (arguments.length === 0) {
-    for (key in this._events) {
-      if (key === 'removeListener') continue;
-      this.removeAllListeners(key);
-    }
-    this.removeAllListeners('removeListener');
-    this._events = {};
-    return this;
-  }
-
-  listeners = this._events[type];
-
-  if (isFunction(listeners)) {
-    this.removeListener(type, listeners);
-  } else {
-    // LIFO order
-    while (listeners.length)
-      this.removeListener(type, listeners[listeners.length - 1]);
-  }
-  delete this._events[type];
-
-  return this;
-};
-
-EventEmitter.prototype.listeners = function(type) {
-  var ret;
-  if (!this._events || !this._events[type])
-    ret = [];
-  else if (isFunction(this._events[type]))
-    ret = [this._events[type]];
-  else
-    ret = this._events[type].slice();
-  return ret;
-};
-
-EventEmitter.listenerCount = function(emitter, type) {
-  var ret;
-  if (!emitter._events || !emitter._events[type])
-    ret = 0;
-  else if (isFunction(emitter._events[type]))
-    ret = 1;
-  else
-    ret = emitter._events[type].length;
-  return ret;
-};
-
-function isFunction(arg) {
-  return typeof arg === 'function';
-}
-
-function isNumber(arg) {
-  return typeof arg === 'number';
-}
-
-function isObject(arg) {
-  return typeof arg === 'object' && arg !== null;
-}
-
-function isUndefined(arg) {
-  return arg === void 0;
-}
-
-},{}],"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/watchify/node_modules/browserify/node_modules/process/browser.js":[function(require,module,exports){
-// shim for using process in browser
-
-var process = module.exports = {};
-
-process.nextTick = (function () {
-    var canSetImmediate = typeof window !== 'undefined'
-    && window.setImmediate;
-    var canMutationObserver = typeof window !== 'undefined'
-    && window.MutationObserver;
-    var canPost = typeof window !== 'undefined'
-    && window.postMessage && window.addEventListener
-    ;
-
-    if (canSetImmediate) {
-        return function (f) { return window.setImmediate(f) };
-    }
-
-    var queue = [];
-
-    if (canMutationObserver) {
-        var hiddenDiv = document.createElement("div");
-        var observer = new MutationObserver(function () {
-            var queueList = queue.slice();
-            queue.length = 0;
-            queueList.forEach(function (fn) {
-                fn();
-            });
-        });
-
-        observer.observe(hiddenDiv, { attributes: true });
-
-        return function nextTick(fn) {
-            if (!queue.length) {
-                hiddenDiv.setAttribute('yes', 'no');
-            }
-            queue.push(fn);
-        };
-    }
-
-    if (canPost) {
-        window.addEventListener('message', function (ev) {
-            var source = ev.source;
-            if ((source === window || source === null) && ev.data === 'process-tick') {
-                ev.stopPropagation();
-                if (queue.length > 0) {
-                    var fn = queue.shift();
-                    fn();
-                }
-            }
-        }, true);
-
-        return function nextTick(fn) {
-            queue.push(fn);
-            window.postMessage('process-tick', '*');
-        };
-    }
-
-    return function nextTick(fn) {
-        setTimeout(fn, 0);
-    };
-})();
-
-process.title = 'browser';
-process.browser = true;
-process.env = {};
-process.argv = [];
-
-function noop() {}
-
-process.on = noop;
-process.addListener = noop;
-process.once = noop;
-process.off = noop;
-process.removeListener = noop;
-process.removeAllListeners = noop;
-process.emit = noop;
-
-process.binding = function (name) {
-    throw new Error('process.binding is not supported');
-};
-
-// TODO(shtylman)
-process.cwd = function () { return '/' };
-process.chdir = function (dir) {
-    throw new Error('process.chdir is not supported');
-};
-
-},{}],"/Users/dlindahl/Personal/retton/retton-circular-progress-button/src/CircularProgressButton.jsx":[function(require,module,exports){
+},{"./lib/React":33}],153:[function(require,module,exports){
 'use strict';
 
 var React = require('react');
@@ -18831,7 +18833,7 @@ var CircularProgressButton = React.createClass({displayName: "CircularProgressBu
   },
   getDefaultProps: function() {
     return {
-      elastic: true,
+      elastic: false,
       height: 70,
       onClick: emptyFn,
       result: RESULT_STATES.INDETERMINATE,
@@ -18935,7 +18937,7 @@ var CircularProgressButton = React.createClass({displayName: "CircularProgressBu
 
 module.exports = CircularProgressButton;
 
-},{"./CircularProgressIndicator.jsx":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/src/CircularProgressIndicator.jsx","./IconCheck.jsx":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/src/IconCheck.jsx","./IconCross.jsx":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/src/IconCross.jsx","react":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/react.js","react/lib/EventListener":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/EventListener.js","react/lib/cx":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/cx.js","react/lib/emptyFunction":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/emptyFunction.js","react/lib/keyMirror":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/keyMirror.js"}],"/Users/dlindahl/Personal/retton/retton-circular-progress-button/src/CircularProgressIndicator.jsx":[function(require,module,exports){
+},{"./CircularProgressIndicator.jsx":154,"./IconCheck.jsx":155,"./IconCross.jsx":156,"react":152,"react/lib/EventListener":21,"react/lib/cx":110,"react/lib/emptyFunction":113,"react/lib/keyMirror":138}],154:[function(require,module,exports){
 (function (process){
 'use strict';
 
@@ -19025,7 +19027,7 @@ var CircularProgressIndicator = React.createClass({displayName: "CircularProgres
 module.exports = CircularProgressIndicator;
 
 }).call(this,require('_process'))
-},{"_process":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/watchify/node_modules/browserify/node_modules/process/browser.js","react":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/react.js","react/lib/EventListener":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/EventListener.js","react/lib/emptyFunction":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/lib/emptyFunction.js"}],"/Users/dlindahl/Personal/retton/retton-circular-progress-button/src/IconCheck.jsx":[function(require,module,exports){
+},{"_process":5,"react":152,"react/lib/EventListener":21,"react/lib/emptyFunction":113}],155:[function(require,module,exports){
 'use strict';
 
 var React = require('react');
@@ -19053,7 +19055,7 @@ var IconCheck = React.createClass({displayName: "IconCheck",
 
 module.exports = IconCheck;
 
-},{"react":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/react.js"}],"/Users/dlindahl/Personal/retton/retton-circular-progress-button/src/IconCross.jsx":[function(require,module,exports){
+},{"react":152}],156:[function(require,module,exports){
 'use strict';
 
 var React = require('react');
@@ -19083,4 +19085,4 @@ var IconCross = React.createClass({displayName: "IconCross",
 
 module.exports = IconCross;
 
-},{"react":"/Users/dlindahl/Personal/retton/retton-circular-progress-button/node_modules/react/react.js"}]},{},["/Users/dlindahl/Personal/retton/retton-circular-progress-button/demo/demo.jsx"]);
+},{"react":152}]},{},[2]);
