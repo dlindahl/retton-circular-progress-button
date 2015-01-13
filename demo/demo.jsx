@@ -47,10 +47,19 @@ var DemoButton = React.createClass({
 var App = React.createClass({
   render: function() {
     return (
-      <div>
-        <DemoButton demo={CircularProgressButton.SUCCESS}/>
-        <DemoButton demo={CircularProgressButton.ERROR}/>
-      </div>
+      <section>
+        <h2>Default progress button (success and error)</h2>
+        <div className="box">
+          <DemoButton demo={CircularProgressButton.SUCCESS}/>
+          <DemoButton demo={CircularProgressButton.ERROR}/>
+        </div>
+
+        <h2>Elastic version, with some easings (success, error)</h2>
+        <div className="box">
+          <DemoButton demo={CircularProgressButton.SUCCESS}/>
+          <DemoButton demo={CircularProgressButton.ERROR}/>
+        </div>
+      </section>
     );
   }
 });
